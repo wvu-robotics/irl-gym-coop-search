@@ -57,7 +57,7 @@ class SailingEnv(gym.Env):
         Returns:
             State: State object
         """
-        super(Sailing, self).__init__()
+        super(SailingEnv, self).__init__()
         self.rng_ = np.random.default_rng()
         self.map_ = np.zeros(_dim)
         self.dim_ = _dim
@@ -79,6 +79,15 @@ class SailingEnv(gym.Env):
         
         self.fig_ = plt.figure()
         self.ax_ = self.fig_.add_subplot(1,1,1)
+        
+        self.action_space = gym.spaces.discrete.Discrete(3) #need to make this map to -1,0,1
+        # print(self.action_space)
+        # self.a_ = [0, 1, 2, 3]
+        self.observation_space = gym.spaces.box.Box(3+_dim[0]*_dim[1],3+_dim[0]*_dim[1])
+        # low=[0,0],high=[_dim])
+        
+        self.observation_space.high = np.ones(3+_dim[0]*_dim[1])
+        self.observation_space.low = np.zeros(3+_dim[0]*_dim[1])
         
     def resample_wind(self):
         if len(self.wind_) != 1:
@@ -117,6 +126,7 @@ class SailingEnv(gym.Env):
             self.wind_ = np.reshape(_state[3:len(_state)], [self.dim_[0], self.dim_[1]])
         # print(self.wind_)
         #self.wind_init_ = self.wind_
+        return self.get_observation()
         
         
         

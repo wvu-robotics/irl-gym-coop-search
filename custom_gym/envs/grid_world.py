@@ -41,6 +41,7 @@ class GridWorldEnv(gym.Env):
         - blue X: goal + agent
         - black: puddle
     """
+    metadata = {"render_modes": ["human"]}
 
     def __init__(self, _dim = [40, 40], _goal= [10, 10], _p = 0):
         """
@@ -63,7 +64,18 @@ class GridWorldEnv(gym.Env):
             for j in range(self.dim_[1]):
                 self.map_[i][j] = self.get_reward([i,j])
         
+        self.action_space = gym.spaces.discrete.Discrete(4)
+        # print(self.action_space)
         self.a_ = [0, 1, 2, 3]
+        _high = np.ones(2)
+        _high[0] = _dim[0]
+        _high[1] = _dim[1]
+        self.observation_space = gym.spaces.box.Box(low =np.zeros(2), high=_high)
+        # low=[0,0],high=[_dim])
+        # self.observation_space.high = np.ones(2)
+        # self.observation_space.high[0] = _dim[0]
+        # self.observation_space.high[1] = _dim[1]
+        # self.observation_space.low = np.zeros(2)
         
         self.fig_ = plt.figure()
         self.ax_ = self.fig_.add_subplot(1,1,1)
@@ -85,7 +97,7 @@ class GridWorldEnv(gym.Env):
             self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)]
         else:
             self.agent_ = _state
-        return self.agent_
+        return self.get_observation()
         
         
     

@@ -51,7 +51,7 @@ class GridTunnelEnv(gym.Env):
         Returns:
             State: State object
         """
-        super(GridTrap, self).__init__()
+        super(GridTrapEnv, self).__init__()
 
         self.map_ = np.zeros(_dim)
         self.dim_ = _dim
@@ -73,6 +73,16 @@ class GridTunnelEnv(gym.Env):
         self.rng_ = np.random.default_rng()
         self.count_im_ = 0
         
+        self.action_space = gym.spaces.discrete.Discrete(4)
+        # print(self.action_space)
+        self.a_ = [0, 1, 2, 3]
+        self.observation_space = gym.spaces.box.Box(2,2)
+        # low=[0,0],high=[_dim])
+        self.observation_space.high = np.ones(2)
+        self.observation_space.high[0] = _dim[0]
+        self.observation_space.high[1] = _dim[1]
+        self.observation_space.low = np.zeros(2)
+        
 
 
         
@@ -87,7 +97,7 @@ class GridTunnelEnv(gym.Env):
             self.agent_ = [self.dim_[0]-self.goal_[0], self.dim_[1]-self.goal_[1]]
         else:
             self.agent_ = _state
-            
+        return self.get_observation()
         
         
         
