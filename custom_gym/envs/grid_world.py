@@ -51,7 +51,7 @@ class GridWorldEnv(gym.Env):
         Returns:
             State: State object
         """
-        super(GridWorld, self).__init__()
+        super(GridWorldEnv, self).__init__()
 
         self.map_ = np.zeros(_dim)
         self.dim_ = _dim
