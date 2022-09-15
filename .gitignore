@@ -1,0 +1,10 @@
+build/
+egg-info/
+*.eps
+*.png
+*.pyc
+*.gif
+*.npy
+*.svg
+*.xcf
+
