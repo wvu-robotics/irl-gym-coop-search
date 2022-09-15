@@ -1,5 +1,5 @@
 build/
-egg-info/
+custom_gym.egg-info/
 *.eps
 *.png
 *.pyc
