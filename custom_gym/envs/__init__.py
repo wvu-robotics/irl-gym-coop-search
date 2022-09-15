@@ -4,19 +4,19 @@ from gym.envs.registration import register
 from grid_world import GridWorldEnv
 
 register(
-    id='decision_making/GridWorld-v0',
-    entry_point='decision_making.envs:GridWorldEnv',
+    id='custom_gym/GridWorld-v0',
+    entry_point='custom_gym.envs:GridWorldEnv',
     max_episode_steps=100,
 )
 
 register(
-    id='decision_making/GridTunnel-v0',
-    entry_point='decision_making.envs:GridTunnelEnv',
+    id='custom_gym/GridTunnel-v0',
+    entry_point='custom_gym.envs:GridTunnelEnv',
     max_episode_steps=100,
 )
 
 register(
-    id='decision_making/Sailing-v0',
-    entry_point='decision_making.envs:SailingEnv',
+    id='custom_gym/Sailing-v0',
+    entry_point='custom_gym.envs:SailingEnv',
     max_episode_steps=100,
 )
