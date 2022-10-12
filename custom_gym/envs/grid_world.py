@@ -155,7 +155,7 @@ class GridWorldEnv(gym.Env):
         #plt.close() 
         
     def get_observation(self):
-        return [int(self.agent_[0]), int(self.agent_[1])]
+        return {"pose": [int(self.agent_[0]), int(self.agent_[1])]}
     
     
     def get_distance(self, s1, s2):
