@@ -48,32 +48,40 @@ class SailingEnv(gym.Env):
         - black: puddle
     """
 
-    def __init__(self, _dim = [40, 40], _goal= [30, 10], _p = 0):
+    def __init__(self, _params):
         """
         Constructor, initializes state
         Args:
-            _p (float): transition probability 
-            _goal (list(int)): coordinate of goal
+            _params (dict): "agent"        [x,y]    - Agent pose
+                            "goal"         [x,y]    - Goal pose
+                            "dim"          [x,y]    - Map dimension
+                            "p"            (int)    - probability of arriving at desired state
+                            "prefix" (string) - where to save images for gifs.
+                            Leave unassigned if none
         Returns:
             State: State object
         """
         super(SailingEnv, self).__init__()
-        self.rng_ = np.random.default_rng()
-        self.map_ = np.zeros(_dim)
-        self.dim_ = _dim
         
-        self.wind_ = np.zeros(1)
-        self.resample_wind()
-        self.wind_init_ = self.wind_
-        # print(self.wind_)
-        self.goal_ = _goal
-        self.img_num_ = 0
-        # for i in range(self.dim_[0]):
-        #     for j in range(self.dim_[1]):
-        #         self.map_[i][j] = self.get_reward([i,j], 0,0)
-                
-        self.p_ = _p
-        self.reset()
+        if "dim" in _params:
+            self.dim_ = _params["dim"]
+        else:
+            self.dim_ = [40, 40]
+            
+        if "goal" in _params:
+            self.goal_ = _params["goal"]
+        else:
+            self.goal_ = [np.round(self.dim_[0]/4), np.round(self.dim_[1]/4)]
+            
+        if "p" in _params:
+            self.p_ = _params["p"]
+        else:
+            self.p_ = 0.1
+            
+        self.map_ = np.zeros(self.dim_)
+        
+        self.rng_ = None
+        
         
         self.a_ = [-1,0,1]
         
@@ -83,11 +91,17 @@ class SailingEnv(gym.Env):
         self.action_space = gym.spaces.discrete.Discrete(3) #need to make this map to -1,0,1
         # print(self.action_space)
         # self.a_ = [0, 1, 2, 3]
-        self.observation_space = gym.spaces.box.Box(3+_dim[0]*_dim[1],3+_dim[0]*_dim[1])
-        # low=[0,0],high=[_dim])
+        self.observation_space = gym.spaces.box.Box(3+self.dim_[0]*self.dim_[1],3+self.dim_[0]*self.dim_[1])
+        # low=[0,0],high=[self.dim_])
         
-        self.observation_space.high = np.ones(3+_dim[0]*_dim[1])
-        self.observation_space.low = np.zeros(3+_dim[0]*_dim[1])
+        self.observation_space.high = np.ones(3+self.dim_[0]*self.dim_[1])
+        self.observation_space.low = np.zeros(3+self.dim_[0]*self.dim_[1])
+
+        if "prefix" in _params:
+            self.save_gif = True
+            self.prefix_ = _params["prefix"]
+            self.count_im_ = 0
+
         
     def resample_wind(self):
         if len(self.wind_) != 1:
@@ -114,22 +128,28 @@ class SailingEnv(gym.Env):
     def get_num_actions(self):
         return 3
     
-    def reset(self, _state = None):
-        # print("-----------")
-        # print(self.wind_)
-        if _state == None:
-            self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2), 0] 
-            self.wind_ = self.wind_init_
-            # print("um")
+
+    def reset(self, seed = None, return_info=None):
+        if seed != None:
+            self.rng_ = np.random.default_rng(seed)
+            self.resample_wind()
+            self.wind_init_ = self.wind_
+        elif type(self.rng_) == None:
+            self.rng_ = np.random.default_rng()
+            self.resample_wind()
+            self.wind_init_ = self.wind_
+
+        if "agent" in self.params_:
+            self.agent_ = self.params_["agent"]
         else:
-            self.agent_ = [_state[0], _state[1], _state[2]]
-            self.wind_ = np.reshape(_state[3:len(_state)], [self.dim_[0], self.dim_[1]])
-        # print(self.wind_)
-        #self.wind_init_ = self.wind_
+            self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2), 0]
+
+        if "wind" in self.params_:
+            self.wind_ = self.params_["wind"]
+        else:
+            self.wind_ = self.wind_init_
         return self.get_observation()
-        
-        
-        
+
     def render(self, fp = None):
             #plt.clf()
         print(self.agent_)
@@ -168,7 +188,7 @@ class SailingEnv(gym.Env):
         #plt.close() 
         
     def get_observation(self):
-        return [int(self.agent_[0]), int(self.agent_[1]), int(self.agent_[2])] + list(self.wind_.ravel())
+        return {"pose": [int(self.agent_[0]), int(self.agent_[1]), int(self.agent_[2])], "wind": self.wind_}
     
     def get_distance(self, s1, s2):
         return np.sqrt( (s1[0]-s2[0])**2 + (s1[1]-s2[1])**2 )

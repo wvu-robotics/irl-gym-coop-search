@@ -42,24 +42,49 @@ class GridTunnelEnv(gym.Env):
         - black: puddle
     """
 
-    def __init__(self, _dim = [40, 40], _goal= [10, 10], _p = 0):
+    def __init__(self, _params):
         """
         Constructor, initializes state
         Args:
-            _p (float): transition probability 
-            _goal (list(int)): coordinate of goal
+            _params (dict): "agent"        [x,y]    - Agent pose
+                            "goal"         [x,y]    - Goal pose
+                            "dim"          [x,y]    - Map dimension
+                            "p"            (int)    - probability of arriving at desired state
+                            "trap_offset"  (int)    - how many steps in +x direction local minima should be placed
+                            "prefix" (string) - where to save images for gifs.
+                            Leave unassigned if none
         Returns:
             State: State object
         """
-        super(GridTrapEnv, self).__init__()
+        super(GridTunnelEnv, self).__init__()
 
-        self.map_ = np.zeros(_dim)
-        self.dim_ = _dim
+        self.params_ = _params
         
-        self.p_ = _p
-        self.goal_ = _goal
-        self.reset()
-        self.trap_ = [self.agent_[0] + 2, self.agent_[1]]
+        if "dim" in _params:
+            self.dim_ = _params["dim"]
+        else:
+            self.dim_ = [40, 40]
+            
+        if "goal" in _params:
+            self.goal_ = _params["goal"]
+        else:
+            self.goal_ = [np.round(self.dim_[0]/4), np.round(self.dim_[1]/4)]
+            
+        if "p" in _params:
+            self.p_ = _params["p"]
+        else:
+            self.p_ = 0.1
+            
+        self.map_ = np.zeros(self.dim_)
+        
+        self.rng_ = None
+
+        if "trap_offset" in _params:
+            offset = _params["trap_offset"]
+        else:
+            offset = 2
+
+        self.trap_ = [self.agent_[0] + offset, self.agent_[1]]
 
         for i in range(self.dim_[0]):
             for j in range(self.dim_[1]):
@@ -79,9 +104,14 @@ class GridTunnelEnv(gym.Env):
         self.observation_space = gym.spaces.box.Box(2,2)
         # low=[0,0],high=[_dim])
         self.observation_space.high = np.ones(2)
-        self.observation_space.high[0] = _dim[0]
-        self.observation_space.high[1] = _dim[1]
+        self.observation_space.high[0] = self.dim_[0]
+        self.observation_space.high[1] = self.dim_[1]
         self.observation_space.low = np.zeros(2)
+
+        if "prefix" in _params:
+            self.save_gif = True
+            self.prefix_ = _params["prefix"]
+            self.count_im_ = 0
         
 
 
@@ -92,11 +122,16 @@ class GridTunnelEnv(gym.Env):
     def get_num_actions(self):
         return 4
     
-    def reset(self, _state = None):
-        if _state == None:
-            self.agent_ = [self.dim_[0]-self.goal_[0], self.dim_[1]-self.goal_[1]]
+    def reset(self, seed = None):
+        if seed != None:
+            self.rng_ = np.random.default_rng(seed)
+        elif type(self.rng_) == None:
+             self.rng_ = np.random.default_rng()
+             
+        if "agent" in self.params_:
+            self.agent_ = self.params_["agent"]
         else:
-            self.agent_ = _state
+            self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)]
         return self.get_observation()
         
         
@@ -141,7 +176,7 @@ class GridTunnelEnv(gym.Env):
         #plt.close() 
         
     def get_observation(self):
-        return [int(self.agent_[0]), int(self.agent_[1])]
+        return {"pose": [int(self.agent_[0]), int(self.agent_[1])]}
     
     
     def get_distance(self, s1, s2):
