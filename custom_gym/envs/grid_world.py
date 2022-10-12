@@ -47,7 +47,12 @@ class GridWorldEnv(gym.Env):
         """
         Constructor, initializes state
         Args:
-            _params (dict): "agent" [x,y], "goal" [x,y], "dim" [x,y], "p" int | the agent position, goal position, world size, and probability of arriving at desired state. Leave unassigned if none
+            _params (dict): "agent"        [x,y]    - Agent pose
+                            "goal"         [x,y]    - Goal pose
+                            "dim"          [x,y]    - Map dimension
+                            "p"            (int)    - probability of arriving at desired state
+                            "prefix" (string) - where to save images for gifs.
+                            Leave unassigned if none
         Returns:
             Gridworld: State object
         """
@@ -79,7 +84,6 @@ class GridWorldEnv(gym.Env):
                 self.map_[i][j] = self.get_reward([i,j])
         
         self.action_space = gym.spaces.discrete.Discrete(4)
-        # print(self.action_space)
         self.a_ = [0, 1, 2, 3]
         _high = np.ones(2)
         _high[0] = self.dim_[0]
@@ -89,9 +93,10 @@ class GridWorldEnv(gym.Env):
         self.fig_ = plt.figure()
         self.ax_ = self.fig_.add_subplot(1,1,1)
         
-        
-        # self.prefix_ = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/gif/"
-        # self.count_im_ = 0
+        if "prefix" in _params:
+            self.save_gif = True
+            self.prefix_ = _params["prefix"]
+            self.count_im_ = 0
 
 
         
