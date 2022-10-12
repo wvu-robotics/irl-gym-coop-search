@@ -43,23 +43,37 @@ class GridWorldEnv(gym.Env):
     """
     metadata = {"render_modes": ["human"]}
 
-    def __init__(self, _dim = [40, 40], _goal= [10, 10], _p = 0):
+    def __init__(self, _params):
         """
         Constructor, initializes state
         Args:
-            _p (float): transition probability 
-            _goal (list(int)): coordinate of goal
+            _params (dict): "agent" [x,y], "goal" [x,y], "dim" [x,y], "p" int | the agent position, goal position, world size, and probability of arriving at desired state. Leave unassigned if none
         Returns:
-            State: State object
+            Gridworld: State object
         """
         super(GridWorldEnv, self).__init__()
-
-        self.map_ = np.zeros(_dim)
-        self.dim_ = _dim
         
-        self.p_ = _p
-        self.goal_ = _goal
-        self.reset()
+        self.params_ = _params
+        
+        if "dim" in _params:
+            self.dim_ = _params["dim"]
+        else:
+            self.dim_ = [40, 40]
+            
+        if "goal" in _params:
+            self.goal_ = _params["goal"]
+        else:
+            self.goal_ = [np.round(self.dim_[0]/4), np.round(self.dim_[1]/4)]
+            
+        if "p" in _params:
+            self.p_ = _params["p"]
+        else:
+            self.p_ = 0.1
+            
+        self.map_ = np.zeros(self.dim_)
+        
+        self.rng_ = None
+        
         for i in range(self.dim_[0]):
             for j in range(self.dim_[1]):
                 self.map_[i][j] = self.get_reward([i,j])
@@ -68,19 +82,14 @@ class GridWorldEnv(gym.Env):
         # print(self.action_space)
         self.a_ = [0, 1, 2, 3]
         _high = np.ones(2)
-        _high[0] = _dim[0]
-        _high[1] = _dim[1]
+        _high[0] = self.dim_[0]
+        _high[1] = self.dim_[1]
         self.observation_space = gym.spaces.box.Box(low =np.zeros(2), high=_high)
-        # low=[0,0],high=[_dim])
-        # self.observation_space.high = np.ones(2)
-        # self.observation_space.high[0] = _dim[0]
-        # self.observation_space.high[1] = _dim[1]
-        # self.observation_space.low = np.zeros(2)
         
         self.fig_ = plt.figure()
         self.ax_ = self.fig_.add_subplot(1,1,1)
         
-        self.rng_ = np.random.default_rng()
+        
         # self.prefix_ = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/gif/"
         # self.count_im_ = 0
 
@@ -92,15 +101,17 @@ class GridWorldEnv(gym.Env):
     def get_num_actions(self):
         return 4
     
-    def reset(self, _state = None,seed = 0):
-        if _state == None:
-            self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)]
+    def reset(self, seed = None, return_info=None):
+        if seed != None:
+            self.rng_ = np.random.default_rng(seed)
+        elif type(self.rng_) == None:
+             self.rng_ = np.random.default_rng()
+        if "agent" in self.params_:
+            self.agent_ = self.params_["agent"]
         else:
-            self.agent_ = _state
+            [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)]
         return self.get_observation()
         
-        
-    
     def render(self, _fp = None):
             #plt.clf()
         print(self.agent_)
@@ -172,13 +183,16 @@ class GridWorldEnv(gym.Env):
         # print(_action)
         self.agent_ = self.get_coordinate_move(self.agent_, _action)
         
-        
+        print("-------------")
+        print(self.agent_)
+        print(self.goal_)
         r = self.get_reward(self.agent_)
         if self.agent_ == self.goal_:
             done = True
         else:
             done = False
-        return self.agent_, r, done, []
+        print(done)
+        return self.agent_, r, done, {}
         
     def get_actions(self, _agent=None):
         n, a = self.get_neighbors(_agent)
