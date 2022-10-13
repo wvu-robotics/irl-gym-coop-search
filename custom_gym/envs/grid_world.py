@@ -107,15 +107,16 @@ class GridWorldEnv(gym.Env):
         return 4
     
     def reset(self, seed = None, return_info=None):
+
         if seed != None:
             self.rng_ = np.random.default_rng(seed)
-        elif type(self.rng_) == None:
-             self.rng_ = np.random.default_rng()
-             
+        elif self.rng_ == None:
+             self.rng_ = np.random.default_rng() 
         if "agent" in self.params_:
             self.agent_ = self.params_["agent"]
         else:
             self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)]
+
         return self.get_observation()
         
     def render(self, _fp = None):

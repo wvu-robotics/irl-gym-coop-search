@@ -134,7 +134,7 @@ class SailingEnv(gym.Env):
             self.rng_ = np.random.default_rng(seed)
             self.resample_wind()
             self.wind_init_ = self.wind_
-        elif type(self.rng_) == None:
+        elif self.rng_ == None:
             self.rng_ = np.random.default_rng()
             self.resample_wind()
             self.wind_init_ = self.wind_

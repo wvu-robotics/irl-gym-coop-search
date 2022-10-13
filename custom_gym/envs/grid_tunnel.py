@@ -125,7 +125,7 @@ class GridTunnelEnv(gym.Env):
     def reset(self, seed = None):
         if seed != None:
             self.rng_ = np.random.default_rng(seed)
-        elif type(self.rng_) == None:
+        elif self.rng_ == None:
              self.rng_ = np.random.default_rng()
              
         if "agent" in self.params_:
