@@ -139,8 +139,8 @@ class SailingEnv(gym.Env):
             self.resample_wind()
             self.wind_init_ = self.wind_
 
-        if "agent" in self.params_:
-            self.agent_ = self.params_["agent"]
+        if "state" in self.params_:
+            self.agent_ = self.params_["state"]
         else:
             self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2), 0]
 

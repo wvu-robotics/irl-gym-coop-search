@@ -128,8 +128,8 @@ class GridTunnelEnv(gym.Env):
         elif self.rng_ == None:
              self.rng_ = np.random.default_rng()
              
-        if "agent" in self.params_:
-            self.agent_ = self.params_["agent"]
+        if "state" in self.params_:
+            self.agent_ = self.params_["state"]
         else:
             self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)]
         return self.get_observation()
@@ -228,7 +228,7 @@ class GridTunnelEnv(gym.Env):
         return self.get_observation(), r, done, []
         
     def get_actions(self, _agent):
-        n, a = self.get_neighbors(_agent)
+        n, a = self.get_neighbors(_agent["pose"])
         return a
     
     def get_neighbors(self, _position):
