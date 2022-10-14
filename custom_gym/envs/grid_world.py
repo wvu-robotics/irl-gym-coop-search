@@ -112,8 +112,8 @@ class GridWorldEnv(gym.Env):
             self.rng_ = np.random.default_rng(seed)
         elif self.rng_ == None:
              self.rng_ = np.random.default_rng() 
-        if "agent" in self.params_:
-            self.agent_ = self.params_["agent"]
+        if "state" in self.params_:
+            self.agent_ = self.params_["state"]
         else:
             self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)]
 
@@ -199,10 +199,10 @@ class GridWorldEnv(gym.Env):
         else:
             done = False
         print(done)
-        return self.agent_, r, done, {}
+        return self.get_observation(), r, done, {}
         
     def get_actions(self, _agent=None):
-        n, a = self.get_neighbors(_agent)
+        n, a = self.get_neighbors(_agent["pose"])
         return a
     
     def get_neighbors(self, _position):
@@ -210,6 +210,7 @@ class GridWorldEnv(gym.Env):
         neighbors_ind = []
         step = [[ 0, -1], [-1,  0], [ 0,  1], [ 1,  0]]
         for i in range(4):
+            print(_position)
             t = _position.copy()
             t[0] += step[i][0]
             t[1] += step[i][1]

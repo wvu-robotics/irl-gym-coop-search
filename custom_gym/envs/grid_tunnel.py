@@ -225,7 +225,7 @@ class GridTunnelEnv(gym.Env):
             done = True
         else:
             done = False
-        return self.agent_, r, done, []
+        return self.get_observation(), r, done, []
         
     def get_actions(self, _agent):
         n, a = self.get_neighbors(_agent)
