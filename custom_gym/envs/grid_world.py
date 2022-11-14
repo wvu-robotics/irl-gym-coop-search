@@ -90,8 +90,8 @@ class GridWorldEnv(gym.Env):
         _high[1] = self.dim_[1]
         self.observation_space = gym.spaces.box.Box(low =np.zeros(2), high=_high)
         
-        self.fig_ = plt.figure()
-        self.ax_ = self.fig_.add_subplot(1,1,1)
+        # self.fig_ = plt.figure()
+        # self.ax_ = self.fig_.add_subplot(1,1,1)
         
         if "prefix" in _params:
             self.save_gif = True
@@ -123,33 +123,33 @@ class GridWorldEnv(gym.Env):
             #plt.clf()
         print(self.agent_)
 
-        plt.cla()
-        #plt.grid()
-        size = 100/self.dim_[0]
-        # Render the environment to the screen
-        t_map = (self.map_)
-        print("max map ", np.max(np.max(self.map_)))
-        plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
-        if self.agent_[0] != self.goal_[0] or self.agent_[1] != self.goal_[1]:
-            plt.plot(self.agent_[0], self.agent_[1],
-                     'bo', markersize=size)  # blue agent
-            plt.plot(self.goal_[0], self.goal_[1],
-                     'gX', markersize=size)
-        else:
-            plt.plot(self.goal_[0], self.goal_[1],
-                     'bX', markersize=size) # agent and goal
+        # plt.cla()
+        # #plt.grid()
+        # size = 100/self.dim_[0]
+        # # Render the environment to the screen
+        # t_map = (self.map_)
+        # print("max map ", np.max(np.max(self.map_)))
+        # plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
+        # if self.agent_[0] != self.goal_[0] or self.agent_[1] != self.goal_[1]:
+        #     plt.plot(self.agent_[0], self.agent_[1],
+        #              'bo', markersize=size)  # blue agent
+        #     plt.plot(self.goal_[0], self.goal_[1],
+        #              'gX', markersize=size)
+        # else:
+        #     plt.plot(self.goal_[0], self.goal_[1],
+        #              'bX', markersize=size) # agent and goal
 
-        # ticks = np.arange(-0.5, self.dim_[0]-0.5, 1)
-        # self.ax_.set_xticks(ticks)
-        # self.ax_.set_yticks(ticks)
-        plt.xticks(color='w')
-        plt.yticks(color='w')
-        plt.show(block=False)
-        if _fp != None:
-            self.fig_.savefig(_fp +"%d.png" % self.img_num_)
-            self.fig_.savefig(_fp +"%d.eps" % self.img_num_)
-            self.img_num_ += 1
-        plt.pause(1)
+        # # ticks = np.arange(-0.5, self.dim_[0]-0.5, 1)
+        # # self.ax_.set_xticks(ticks)
+        # # self.ax_.set_yticks(ticks)
+        # plt.xticks(color='w')
+        # plt.yticks(color='w')
+        # plt.show(block=False)
+        # if _fp != None:
+        #     self.fig_.savefig(_fp +"%d.png" % self.img_num_)
+        #     self.fig_.savefig(_fp +"%d.eps" % self.img_num_)
+        #     self.img_num_ += 1
+        # plt.pause(1)
         # plt.savefig(self.prefix_ + "img" + str(self.count_im_) + ".png", format="png", bbox_inches="tight", pad_inches=0.05)
         # self.count_im_+=1
 
@@ -190,15 +190,15 @@ class GridWorldEnv(gym.Env):
         # print(_action)
         self.agent_ = self.get_coordinate_move(self.agent_, _action)
         
-        print("-------------")
-        print(self.agent_)
-        print(self.goal_)
+        # print("-------------")
+        # print(self.agent_)
+        # print(self.goal_)
         r = self.get_reward(self.agent_)
         if self.agent_ == self.goal_:
             done = True
         else:
             done = False
-        print(done)
+        # print(done)
         return self.get_observation(), r, done, {}
         
     def get_actions(self, _agent=None):
@@ -210,7 +210,7 @@ class GridWorldEnv(gym.Env):
         neighbors_ind = []
         step = [[ 0, -1], [-1,  0], [ 0,  1], [ 1,  0]]
         for i in range(4):
-            print(_position)
+            # print(_position)
             t = _position.copy()
             t[0] += step[i][0]
             t[1] += step[i][1]
@@ -226,11 +226,11 @@ class GridWorldEnv(gym.Env):
         if   _action == 0:
             step = [ 0, -1] # S
         elif _action == 1:
-            step = [-1,  0] #  W
+            step = [-1,  0] # W
         elif _action == 2:
             step = [ 0,  1] # N
         elif _action == 3:
-            step = [ 1,  0] # NE
+            step = [ 1,  0] # E
         else:
             step = [0, 0]   #  Z
 

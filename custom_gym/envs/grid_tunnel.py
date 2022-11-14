@@ -185,14 +185,14 @@ class GridTunnelEnv(gym.Env):
     
     def get_reward(self, _s, _p = False):
         d = self.get_distance(_s, self.goal_)
-        if _p:
-            print(d)
+        # if _p:
+        #     print(d)
         if d >= 5:
             d = self.get_distance(_s, self.trap_)
-            if _p:
-                print(d)
-                print(_s)
-                print(self.trap_)
+            # if _p:
+            #     print(d)
+            #     print(_s)
+            #     print(self.trap_)
             if d >= 5:
                 return 0
             else:
