@@ -82,7 +82,7 @@ class SailingEnv(gym.Env):
         
         self.rng_ = None
         
-        self.wind = [-1]
+        self.wind_ = [-1]
         self.resample_wind()
         
         self.a_ = [-1,0,1]
