@@ -121,23 +121,23 @@ class GridWorldEnv(gym.Env):
         
     def render(self, _fp = None):
             #plt.clf()
-        print(self.agent_)
+        # print(self.agent_)
 
-        # plt.cla()
-        # #plt.grid()
-        # size = 100/self.dim_[0]
-        # # Render the environment to the screen
-        # t_map = (self.map_)
-        # print("max map ", np.max(np.max(self.map_)))
-        # plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
-        # if self.agent_[0] != self.goal_[0] or self.agent_[1] != self.goal_[1]:
-        #     plt.plot(self.agent_[0], self.agent_[1],
-        #              'bo', markersize=size)  # blue agent
-        #     plt.plot(self.goal_[0], self.goal_[1],
-        #              'gX', markersize=size)
-        # else:
-        #     plt.plot(self.goal_[0], self.goal_[1],
-        #              'bX', markersize=size) # agent and goal
+        plt.cla()
+        #plt.grid()
+        size = 100/self.dim_[0]
+        # Render the environment to the screen
+        t_map = (self.map_)
+        print("max map ", np.max(np.max(self.map_)))
+        plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
+        if self.agent_[0] != self.goal_[0] or self.agent_[1] != self.goal_[1]:
+            plt.plot(self.agent_[0], self.agent_[1],
+                     'bo', markersize=size)  # blue agent
+            plt.plot(self.goal_[0], self.goal_[1],
+                     'gX', markersize=size)
+        else:
+            plt.plot(self.goal_[0], self.goal_[1],
+                     'bX', markersize=size) # agent and goal
 
         # # ticks = np.arange(-0.5, self.dim_[0]-0.5, 1)
         # # self.ax_.set_xticks(ticks)
@@ -149,12 +149,12 @@ class GridWorldEnv(gym.Env):
         #     self.fig_.savefig(_fp +"%d.png" % self.img_num_)
         #     self.fig_.savefig(_fp +"%d.eps" % self.img_num_)
         #     self.img_num_ += 1
-        # plt.pause(1)
+        plt.pause(1)
         # plt.savefig(self.prefix_ + "img" + str(self.count_im_) + ".png", format="png", bbox_inches="tight", pad_inches=0.05)
         # self.count_im_+=1
+        plt.show()
 
-
-        #plt.close() 
+        # plt.close() 
         
     def get_observation(self):
         return {"pose": [int(self.agent_[0]), int(self.agent_[1])]}
@@ -183,7 +183,6 @@ class GridWorldEnv(gym.Env):
     
     def step(self, _action):
         self.map_[int(self.agent_[0])][int(self.agent_[1])]+=1
-
         # print("------")
         # print(_action)
         _action = self.sample_transition(_action)
