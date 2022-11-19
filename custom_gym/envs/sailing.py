@@ -62,7 +62,7 @@ class SailingEnv(gym.Env):
             State: State object
         """
         super(SailingEnv, self).__init__()
-        
+        self.params_ = _params
         if "dim" in _params:
             self.dim_ = _params["dim"]
         else:
@@ -83,8 +83,9 @@ class SailingEnv(gym.Env):
         self.rng_ = None
         
         self.wind_ = [-1]
-        self.resample_wind()
         
+        self.reset()
+    
         self.a_ = [-1,0,1]
         
         self.fig_ = plt.figure()
@@ -98,7 +99,7 @@ class SailingEnv(gym.Env):
         
         self.observation_space.high = np.ones(3+self.dim_[0]*self.dim_[1])
         self.observation_space.low = np.zeros(3+self.dim_[0]*self.dim_[1])
-
+    
         if "prefix" in _params:
             self.save_gif = True
             self.prefix_ = _params["prefix"]
@@ -190,6 +191,7 @@ class SailingEnv(gym.Env):
         #plt.close() 
         
     def get_observation(self):
+        print(self.agent_)
         return {"pose": [int(self.agent_[0]), int(self.agent_[1]), int(self.agent_[2])], "wind": self.wind_}
     
     def get_distance(self, s1, s2):
