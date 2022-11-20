@@ -155,7 +155,6 @@ class SailingEnv(gym.Env):
 
     def render(self, fp = None):
             #plt.clf()
-        print(self.agent_)
         plt.cla()
         #plt.grid()
         size = 200/self.dim_[0]
@@ -191,7 +190,6 @@ class SailingEnv(gym.Env):
         #plt.close() 
         
     def get_observation(self):
-        print(self.agent_)
         return {"pose": [int(self.agent_[0]), int(self.agent_[1]), int(self.agent_[2])], "wind": self.wind_}
     
     def get_distance(self, s1, s2):
@@ -258,8 +256,7 @@ class SailingEnv(gym.Env):
             done = False
             
         self.resample_wind()
-        # print(self.wind_)
-        return self.get_observation(), r, done, []
+        return self.get_observation(), r, done, {}
         
     def get_actions(self, _agent=None):
 
