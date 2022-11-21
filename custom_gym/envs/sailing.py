@@ -90,8 +90,9 @@ class SailingEnv(gym.Env):
         
         self.a_ = [-1,0,1]
         
-        self.fig_ = plt.figure()
-        self.ax_ = self.fig_.add_subplot(1,1,1)
+        if self.params_["render"]:
+            self.fig_ = plt.figure()
+            self.ax_ = self.fig_.add_subplot(1,1,1)
         
         self.action_space = gym.spaces.discrete.Discrete(3) #need to make this map to -1,0,1
         # print(self.action_space)
@@ -160,39 +161,42 @@ class SailingEnv(gym.Env):
 
     def render(self, fp = None):
             #plt.clf()
-        plt.cla()
-        #plt.grid()
-        size = 200/self.dim_[0]
-        # Render the environment to the screen
-        t_map = (self.map_)
-        plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
-        for i in range(self.dim_[0]):
-                for j in range(self.dim_[1]):
-                    arr = self.act_2_dir(self.wind_[i][j])
-                    plt.arrow(i,j,arr[0]/3, arr[1]/3)
-        if self.agent_[0] != self.goal_[0] or self.agent_[1] != self.goal_[1]:
-            plt.plot(self.agent_[0], self.agent_[1],
-                     'bo', markersize=size)  # blue agent
-            temp = self.act_2_dir(int(self.agent_[2]))
-            plt.arrow(int(self.agent_[0]),int(self.agent_[1]),temp[0],temp[1])
-            plt.plot(self.goal_[0], self.goal_[1],
-                     'gX', markersize=size)
-        else:
-            plt.plot(self.goal_[0], self.goal_[1],
-                     'bX', markersize=size) # agent and goal
+        if self.params_["render"]:
+            plt.cla()
+            #plt.grid()
+            size = 200/self.dim_[0]
+            # Render the environment to the screen
+            t_map = (self.map_)
+            plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
+            for i in range(self.dim_[0]):
+                    for j in range(self.dim_[1]):
+                        arr = self.act_2_dir(self.wind_[i][j])
+                        plt.arrow(i,j,arr[0]/3, arr[1]/3)
+            if self.agent_[0] != self.goal_[0] or self.agent_[1] != self.goal_[1]:
+                plt.plot(self.agent_[0], self.agent_[1],
+                        'bo', markersize=size)  # blue agent
+                temp = self.act_2_dir(int(self.agent_[2]))
+                plt.arrow(int(self.agent_[0]),int(self.agent_[1]),temp[0],temp[1])
+                plt.plot(self.goal_[0], self.goal_[1],
+                        'gX', markersize=size)
+            else:
+                plt.plot(self.goal_[0], self.goal_[1],
+                        'bX', markersize=size) # agent and goal
 
-        # ticks = np.arange(-0.5, self.dim_[0]-0.5, 1)
-        # self.ax_.set_xticks(ticks)
-        # self.ax_.set_yticks(ticks)
-        # plt.xticks(color='w')
-        # plt.yticks(color='w')
-        plt.show(block=False)
-        if fp != None:
-            self.fig_.savefig(fp +"%d.png" % self.img_num_)
-            self.fig_.savefig(fp +"%d.eps" % self.img_num_)
-            self.img_num_ += 1
-        plt.pause(1)
-        #plt.close() 
+            # ticks = np.arange(-0.5, self.dim_[0]-0.5, 1)
+            # self.ax_.set_xticks(ticks)
+            # self.ax_.set_yticks(ticks)
+            # plt.xticks(color='w')
+            # plt.yticks(color='w')
+            plt.show(block=False)
+            if fp != None:
+                self.fig_.savefig(fp +"%d.png" % self.img_num_)
+                self.fig_.savefig(fp +"%d.eps" % self.img_num_)
+                self.img_num_ += 1
+            plt.pause(1)
+            #plt.close() 
+        elif self.params_["print"]:
+            print(self.agent_)
         
     def get_observation(self):
         return {"pose": [int(self.agent_[0]), int(self.agent_[1]), int(self.agent_[2])], "wind": self.wind_}

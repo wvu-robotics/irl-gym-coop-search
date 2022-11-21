@@ -92,8 +92,9 @@ class GridTunnelEnv(gym.Env):
         
         self.a_ = [0, 1, 2, 3]
         
-        self.fig_ = plt.figure()
-        self.ax_ = self.fig_.add_subplot(1,1,1)
+        if self.params_["render"]:
+            self.fig_ = plt.figure()
+            self.ax_ = self.fig_.add_subplot(1,1,1)
         
         self.rng_ = np.random.default_rng()
         self.count_im_ = 0
@@ -139,41 +140,40 @@ class GridTunnelEnv(gym.Env):
     
     def render(self, _fp = None):
             #plt.clf()
-        print(self.agent_)
+        if self.params_["render"]:
+            plt.cla()
+            #plt.grid()
+            size = 100/self.dim_[0]
+            # Render the environment to the screen
+            t_map = (self.map_)
+            print("max map ", np.max(np.max(self.map_)))
+            plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
+            if self.agent_[0] != self.goal_[0] or self.agent_[1] != self.goal_[1]:
+                plt.plot(self.agent_[0], self.agent_[1],
+                        'bo', markersize=size)  # blue agent
+                plt.plot(self.goal_[0], self.goal_[1],
+                        'gX', markersize=size)
+            else:
+                plt.plot(self.goal_[0], self.goal_[1],
+                        'bX', markersize=size) # agent and goal
 
-        plt.cla()
-        #plt.grid()
-        size = 100/self.dim_[0]
-        # Render the environment to the screen
-        t_map = (self.map_)
-        print("max map ", np.max(np.max(self.map_)))
-        plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
-        if self.agent_[0] != self.goal_[0] or self.agent_[1] != self.goal_[1]:
-            plt.plot(self.agent_[0], self.agent_[1],
-                     'bo', markersize=size)  # blue agent
-            plt.plot(self.goal_[0], self.goal_[1],
-                     'gX', markersize=size)
-        else:
-            plt.plot(self.goal_[0], self.goal_[1],
-                     'bX', markersize=size) # agent and goal
-
-        # ticks = np.arange(-0.5, self.dim_[0]-0.5, 1)
-        # self.ax_.set_xticks(ticks)
-        # self.ax_.set_yticks(ticks)
-        plt.xticks(color='w')
-        plt.yticks(color='w')
-        plt.show(block=False)
-        if _fp != None:
-            self.fig_.savefig(_fp +"%d.png" % self.img_num_)
-            self.fig_.savefig(_fp +"%d.eps" % self.img_num_)
-            self.img_num_ += 1
-        plt.pause(1)
-        # if _fp != None:
-        #     plt.savefig(_fp + "img" + str(self.count_im_) + ".png", format="png", bbox_inches="tight", pad_inches=0.05)
-        #     self.count_im_+=1
-
-
-        #plt.close() 
+            # ticks = np.arange(-0.5, self.dim_[0]-0.5, 1)
+            # self.ax_.set_xticks(ticks)
+            # self.ax_.set_yticks(ticks)
+            plt.xticks(color='w')
+            plt.yticks(color='w')
+            plt.show(block=False)
+            if _fp != None:
+                self.fig_.savefig(_fp +"%d.png" % self.img_num_)
+                self.fig_.savefig(_fp +"%d.eps" % self.img_num_)
+                self.img_num_ += 1
+            plt.pause(1)
+            # if _fp != None:
+            #     plt.savefig(_fp + "img" + str(self.count_im_) + ".png", format="png", bbox_inches="tight", pad_inches=0.05)
+            #     self.count_im_+=1
+            #plt.close() 
+        elif self.params_["print"]:
+            print(self.agent_)
         
     def get_observation(self):
         return {"pose": [int(self.agent_[0]), int(self.agent_[1])]}
