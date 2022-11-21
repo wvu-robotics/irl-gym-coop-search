@@ -7,6 +7,7 @@ sys.path.append(parent)
 import gym
 from gym import spaces
 
+import copy
 import random
 import numpy as np
 import matplotlib.pyplot as plt
@@ -63,7 +64,7 @@ class SailingEnv(gym.Env):
         """
         super(SailingEnv, self).__init__()
         self.params_ = _params
-        if "dim" in _params:
+        if "dimensions" in _params:
             self.dim_ = _params["dimensions"]
         else:
             self.dim_ = [40, 40]
@@ -85,7 +86,7 @@ class SailingEnv(gym.Env):
         self.wind_ = [-1]
         
         self.reset()
-    
+        
         self.a_ = [-1,0,1]
         
         self.fig_ = plt.figure()
@@ -136,21 +137,21 @@ class SailingEnv(gym.Env):
         if seed != None:
             self.rng_ = np.random.default_rng(seed)
             self.resample_wind()
-            self.wind_init_ = self.wind_
+            self.self.params_["state"]["wind"] = self.wind_
         elif self.rng_ == None:
             self.rng_ = np.random.default_rng()
             self.resample_wind()
-            self.wind_init_ = self.wind_
+            print(self.params_["state"])
+            print(self.wind_)
+            self.params_["state"]["wind"] = self.wind_
 
-        if "state" in self.params_:
-            self.agent_ = self.params_["state"]
+        if "pose" in self.params_["state"]:
+            self.agent_ = self.params_["state"]["pose"]
         else:
             self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2), 0]
 
-        if "wind" in self.params_:
-            self.wind_ = self.params_["wind"]
-        else:
-            self.wind_ = self.wind_init_
+        self.wind_ = self.params_["state"]["wind"]
+        
         return self.get_observation()
 
     def render(self, fp = None):

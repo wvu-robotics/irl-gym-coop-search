@@ -60,7 +60,7 @@ class GridTunnelEnv(gym.Env):
 
         self.params_ = _params
         
-        if "dim" in _params:
+        if "dimensions" in _params:
             self.dim_ = _params["dimensions"]
         else:
             self.dim_ = [40, 40]
