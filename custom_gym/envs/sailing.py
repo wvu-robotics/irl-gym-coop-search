@@ -64,7 +64,7 @@ class SailingEnv(gym.Env):
         super(SailingEnv, self).__init__()
         self.params_ = _params
         if "dim" in _params:
-            self.dim_ = _params["dim"]
+            self.dim_ = _params["dimensions"]
         else:
             self.dim_ = [40, 40]
             
