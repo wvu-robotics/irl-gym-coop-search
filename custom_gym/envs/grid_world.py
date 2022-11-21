@@ -113,7 +113,7 @@ class GridWorldEnv(gym.Env):
         elif self.rng_ == None:
              self.rng_ = np.random.default_rng() 
         if "state" in self.params_:
-            self.agent_ = self.params_["state"]
+            self.agent_ = self.params_["state"]["pose"]
         else:
             self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)]
 

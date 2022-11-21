@@ -63,7 +63,8 @@ class SailingEnv(gym.Env):
             State: State object
         """
         super(SailingEnv, self).__init__()
-        self.params_ = _params
+        self.params_ = copy.deepcopy(_params)
+        # print("---", self.params_)
         if "dimensions" in _params:
             self.dim_ = _params["dimensions"]
         else:
@@ -141,8 +142,11 @@ class SailingEnv(gym.Env):
         elif self.rng_ == None:
             self.rng_ = np.random.default_rng()
             self.resample_wind()
-            print(self.params_["state"])
-            print(self.wind_)
+            # print(self.params_)
+            # print(self.params_["state"])
+            # if "wind" not in self.params_["state"]:
+            #     self.params_["state"]["wind"] = []
+            # print(self.wind_)
             self.params_["state"]["wind"] = self.wind_
 
         if "pose" in self.params_["state"]:
