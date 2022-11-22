@@ -138,24 +138,24 @@ class SailingEnv(gym.Env):
     def reset(self, seed = None, return_info=None):
         if seed != None:
             self.rng_ = np.random.default_rng(seed)
-            self.resample_wind()
-            self.self.params_["state"]["wind"] = self.wind_
         elif self.rng_ == None:
             self.rng_ = np.random.default_rng()
+        
+        if "wind" not in self.params_["state"]:
             self.resample_wind()
             # print(self.params_)
             # print(self.params_["state"])
             # if "wind" not in self.params_["state"]:
             #     self.params_["state"]["wind"] = []
             # print(self.wind_)
-            self.params_["state"]["wind"] = self.wind_
+            self.params_["state"]["wind"] = copy.deepcopy(self.wind_)
 
         if "pose" in self.params_["state"]:
             self.agent_ = self.params_["state"]["pose"]
         else:
             self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2), 0]
 
-        self.wind_ = self.params_["state"]["wind"]
+        self.wind_ = copy.deepcopy(self.params_["state"]["wind"])
         
         return self.get_observation()
 
@@ -199,7 +199,7 @@ class SailingEnv(gym.Env):
             print(self.agent_)
         
     def get_observation(self):
-        return {"pose": [int(self.agent_[0]), int(self.agent_[1]), int(self.agent_[2])], "wind": self.wind_}
+        return copy.deepcopy({"pose": [int(self.agent_[0]), int(self.agent_[1]), int(self.agent_[2])], "wind": self.wind_})
     
     def get_distance(self, s1, s2):
         return np.sqrt( (s1[0]-s2[0])**2 + (s1[1]-s2[1])**2 )
