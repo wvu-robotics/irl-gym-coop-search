@@ -11,6 +11,7 @@ from gym import spaces
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+from copy import deepcopy
 
 
 class GridTunnelEnv(gym.Env):
@@ -79,11 +80,12 @@ class GridTunnelEnv(gym.Env):
         
         self.rng_ = None
 
-        if "trap_offset" in _params:
-            offset = _params["trap_offset"]
+        if "offset" in _params:
+            offset = _params["offset"]
         else:
             offset = 2
 
+        self.reset()
         self.trap_ = [self.agent_[0] + offset, self.agent_[1]]
 
         for i in range(self.dim_[0]):
@@ -102,20 +104,19 @@ class GridTunnelEnv(gym.Env):
         self.action_space = gym.spaces.discrete.Discrete(4)
         # print(self.action_space)
         self.a_ = [0, 1, 2, 3]
-        self.observation_space = gym.spaces.box.Box(2,2)
-        # low=[0,0],high=[_dim])
-        self.observation_space.high = np.ones(2)
-        self.observation_space.high[0] = self.dim_[0]
-        self.observation_space.high[1] = self.dim_[1]
-        self.observation_space.low = np.zeros(2)
-
+        _high = np.ones(2)
+        _high[0] = self.dim_[0]
+        _high[1] = self.dim_[1]
+        self.observation_space = gym.spaces.box.Box(low =np.zeros(2), high=_high)
+        
+        if self.params_["render"]:
+            self.fig_ = plt.figure()
+            self.ax_ = self.fig_.add_subplot(1,1,1)
+            
         if "prefix" in _params:
             self.save_gif = True
             self.prefix_ = _params["prefix"]
             self.count_im_ = 0
-        
-
-
         
     def get_num_states(self):
         return self.dim_[0]*self.dim_[1]
@@ -176,7 +177,8 @@ class GridTunnelEnv(gym.Env):
             print(self.agent_)
         
     def get_observation(self):
-        return {"pose": [int(self.agent_[0]), int(self.agent_[1])]}
+        # print({"pose": [int(self.agent_[0]), int(self.agent_[1])]})
+        return deepcopy({"pose": [int(self.agent_[0]), int(self.agent_[1])]})
     
     
     def get_distance(self, s1, s2):
@@ -211,8 +213,8 @@ class GridTunnelEnv(gym.Env):
         return _action
     
     def step(self, _action):
+        # print(_action)
         # self.map_[int(self.agent_[0])][int(self.agent_[1])]+=1
-
         # print("------")
         # print(_action)
         _action = self.sample_transition(_action)
@@ -225,7 +227,8 @@ class GridTunnelEnv(gym.Env):
             done = True
         else:
             done = False
-        return self.get_observation(), r, done, []
+        # print(self.get_observation(), r, done, [])
+        return self.get_observation(), r, done, False, {}
         
     def get_actions(self, _agent):
         n, a = self.get_neighbors(_agent["pose"])

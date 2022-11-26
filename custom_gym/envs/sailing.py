@@ -265,7 +265,7 @@ class SailingEnv(gym.Env):
             done = False
             
         self.resample_wind()
-        return self.get_observation(), r, done, {}
+        return self.get_observation(), r, done, False, {}
         
     def get_actions(self, _agent=None):
 

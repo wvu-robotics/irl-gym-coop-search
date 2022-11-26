@@ -15,7 +15,7 @@ register(
     max_episode_steps=100,
     reward_threshold = None,
     disable_env_checker=True,
-    nondeterministic = False,
+    nondeterministic = True,
     order_enforce = True,
     autoreset = False,
     kwargs = 
@@ -38,7 +38,7 @@ register(
     max_episode_steps=100,
     reward_threshold = None,
     disable_env_checker=True,
-    nondeterministic = False,
+    nondeterministic = True,
     order_enforce = True,
     autoreset = False,
     kwargs = 
@@ -61,7 +61,7 @@ register(
     max_episode_steps=100 ,
     reward_threshold = None,
     disable_env_checker=True,
-    nondeterministic = False,
+    nondeterministic = True,
     order_enforce = True,
     autoreset = False,
     kwargs = 

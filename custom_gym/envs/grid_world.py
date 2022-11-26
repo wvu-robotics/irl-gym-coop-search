@@ -12,6 +12,8 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 
+from copy import deepcopy
+
 
 class GridWorldEnv(gym.Env):
     """
@@ -160,7 +162,7 @@ class GridWorldEnv(gym.Env):
             print(self.agent_)
         
     def get_observation(self):
-        return {"pose": [int(self.agent_[0]), int(self.agent_[1])]}
+        return deepcopy({"pose": [int(self.agent_[0]), int(self.agent_[1])]})
     
     
     def get_distance(self, s1, s2):
@@ -185,7 +187,7 @@ class GridWorldEnv(gym.Env):
         return _action
     
     def step(self, _action):
-        self.map_[int(self.agent_[0])][int(self.agent_[1])]+=1
+        #self.map_[int(self.agent_[0])][int(self.agent_[1])]+=1
         # print("------")
         # print(_action)
         _action = self.sample_transition(_action)
@@ -201,7 +203,7 @@ class GridWorldEnv(gym.Env):
         else:
             done = False
         # print(done)
-        return self.get_observation(), r, done, {}
+        return self.get_observation(), r, done, False, {}
         
     def get_actions(self, _agent=None):
         n, a = self.get_neighbors(_agent["pose"])
