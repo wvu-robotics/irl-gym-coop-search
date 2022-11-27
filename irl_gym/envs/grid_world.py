@@ -17,31 +17,40 @@ from copy import deepcopy
 
 class GridWorldEnv(gym.Env):
     """
-    Enviroment consisting of gridcells. Agent can move in cardinal directions and Let's an agent traverse a world starting from 0,0
-    Description:
-        Agent tries to get to goal. Reward decreases from 1 to 0 in radius of 5 around goal
-    User defines:
-        goal, transition probability
+    Simple Gridworold where agent seeks to reach goal. 
+    
+    States
+    ------
+        {
+            "pose": [x,y]
+        }
         
-    Observations:
-        agent position
-    Actions:
+    Observations
+    ------------
+        Agent position is fully observable: { "pose": [x,y] }
+
+    Actions
+    -------
         -  S 0: move south        [ 0, -1]
         -  W 1: move west         [-1,  0]
         -  N 2: move north        [ 0,  1]
         -  E 3: move east         [ 1,  0]
-        -  Z 4: stay              [ 0,  0]
     
-    Transition: 
-        movement 
-    Rewards:
-        - (-R_[0]*d) negative of distance
-        -   R_[1]  goal reached
-    Rendering:
+    Transition 
+    ----------
+        -   params["p"]         Remain in place
+        -   1 - params["p"]     Transition to desired state
+        
+    Reward
+    ------
+        - -0.01                                     Robot greater than params["reward_dist"] of goal
+        - 1-(distance/params["reward_dist"])**2     Robot within params["reward_dist"] of goal
+
+    Rendering
+    ---------
         - blue: agent
         - green X: goal 
         - blue X: goal + agent
-        - black: puddle
     """
     metadata = {"render_modes": ["human"]}
 

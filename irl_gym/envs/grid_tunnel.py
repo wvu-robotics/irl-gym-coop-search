@@ -16,24 +16,33 @@ from copy import deepcopy
 
 class GridTunnelEnv(gym.Env):
     """
-    Let's an agent traverse a world starting from 0,0
-    Description:
-        Agent tries to get to goal. Reward decreases from 1 to 0 in radius of 5 around goal
-    User defines:
-        goal, transition probability
-        
-    Observations:
-        agent position
-    Actions:
-        -  S 0: move south        [ 0, -1]
-        -  W 2: move west         [-1,  0]
-        -  N 4: move north        [ 0,  1]
-        -  E 6: move east         [ 1,  0]
-        -  Z 8: stay              [ 0,  0]
+    Simple Gridworold where agent seeks to reach goal. 
     
-    Transition: 
-        movement 
-    Rewards:
+    States
+    ------
+        {
+            "pose": [x,y]
+        }
+        
+    Observations
+    ------------
+        Agent position is fully observable: { "pose": [x,y] }
+
+    Actions
+    -------
+        -  S 0: move south        [ 0, -1]
+        -  W 1: move west         [-1,  0]
+        -  N 2: move north        [ 0,  1]
+        -  E 3: move east         [ 1,  0]
+    
+    Transition 
+    ----------
+        -   params["p"]         Remain in place
+        -   1 - params["p"]     Transition to desired state
+        
+    Reward
+    ------
+        - 
         - (-R_[0]*d) negative of distance
         -   R_[1]  goal reached
     Rendering:
