@@ -17,7 +17,7 @@ from copy import deepcopy
 
 class GridWorldEnv(gym.Env):
     """
-    Let's an agent traverse a world starting from 0,0
+    Enviroment consisting of gridcells. Agent can move in cardinal directions and Let's an agent traverse a world starting from 0,0
     Description:
         Agent tries to get to goal. Reward decreases from 1 to 0 in radius of 5 around goal
     User defines:

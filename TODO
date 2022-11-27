@@ -1,0 +1,8 @@
+# TODO
+
+- Update Gym to new step API which returns two bools
+- Update rendering (and figure saving interface for gifs/videos)
+- Write-up documentation and clean code
+- Setup Sphinx and ReadtheDocs website
+- Condense reused code
+- Allow option to turn diagonal motion on/off

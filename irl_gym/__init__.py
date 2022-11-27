@@ -1,13 +1,10 @@
-#__all__ = ["gridworld", "gridtrap", "sailing"]
-
-# import sys
-# import os
-# current = os.path.dirname(os.path.realpath(__file__))
-# parent = os.path.dirname(current)
-# sys.path.append(parent)
-
 from gym.envs.registration import register
 
+
+"""
+Installs irl_gym envs
+
+"""
 
 register(
     id='irl_gym/GridWorld-v0',
