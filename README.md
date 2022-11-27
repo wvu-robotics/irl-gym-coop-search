@@ -1,8 +1,8 @@
-# custom_gym
+# irl_gym
 Custom OpenAI gym environments
 
 From parent directory, call
 
 ```
-pip install -e custom-gym
+pip install -e irl-gym
 ```
