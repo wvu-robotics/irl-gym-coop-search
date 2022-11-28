@@ -9,19 +9,20 @@ Grid Tunnel
 
 .. autoclass:: irl_gym.envs.grid_tunnel
    :members:
+   :special-members:
    :undoc-members:
    :show-inheritance:
 
-irl\_gym.envs.grid\_world module
---------------------------------
+Grid World
+----------
 
-.. autoclass:: irl_gym.envs.grid_world
+.. automodule:: irl_gym.envs.grid_world
    :members:
    :undoc-members:
    :show-inheritance:
 
-irl\_gym.envs.sailing module
-----------------------------
+Sailing
+-------
 
 .. autoclass:: irl_gym.envs.sailing
    :members:
