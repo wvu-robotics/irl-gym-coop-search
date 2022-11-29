@@ -14,20 +14,20 @@ import matplotlib.pyplot as plt
 
 from copy import deepcopy
 
+from irl_gym.utils.utils import *
+
 
 class GridWorldEnv(gym.Env):
     """
-    Simple Gridworold where agent seeks to reach goal. 
+    Simple Gridworld where agent seeks to reach goal. 
     
-    **States**
-    
-    dict:
+    **States** (dict)
     
     - "pose": [x,y]
         
     **Observations**
     
-    Agent position is fully observable: { "pose": [x,y] }
+    Agent position is fully observable
 
     **Actions**
     
@@ -36,32 +36,46 @@ class GridWorldEnv(gym.Env):
     - 2: move north        [ 0,  1]
     - 3: move east         [ 1,  0]
     
-    **Transition**
+    **Transition Probabilities**
 
-    - params["p"]         Remain in place
-    - 1 - params["p"]     Transition to desired state
+    - p, remain in place
+    - 1-p, transition to desired state
         
     **Reward**
-
-    - -0.01                                     Robot greater than params["reward_dist"] of goal
-    - 1-(distance/params["reward_dist"])**2     Robot within params["reward_dist"] of goal
-
+    
+    $a \atop b$
+        
+    .. math::
+        
+        R = \Biggl \lbrace
+        {
+        -0.01, d > r_{goal} 
+        \Atop
+        1 - \dfrac{d}{r}^2, d \leq r
+        },
+ 
+    where :math: `d` is the distance to the goal and :math: `r_{goal}` is the reward radius of the goal.
+    
+    - -0.01, robot greater than reward radius of goal
+    - 1-(d/r)^2, robot within reward radius of goal
+    
+    **Input**
+    Input parameters are passed as arguments through the ``_params`` dict.
+    He we list them out using the corresponding keys.
+    
+    :param dimensions: ([x,y]) size of map, *default* [40,40]
+    :param goal: ([x,y]) position of goal, *default* [10,10]
+    :param state: (State) Initial state, *default*: {"pose": [20,20]}
+    :param r_radius: (float) Reward radius, *default*: 5.0
+    :param p: (float) probability of remaining in place, *default*: 0.1
+    :param render: (bool) render on/off, *default*: False
+    :param print: (bool) text render on/off, *default*: True
+    :param prefix: (string) where to save images, *default*: ""
+    :param save_gif: (bool) save images for gif, *default*: False
     """
     metadata = {"render_modes": ["human"]}
 
-    def __init__(self, _params):
-        """
-        Constructor, initializes state
-        Args:
-            _params (dict): "agent"        [x,y]    - Agent pose
-                            "goal"         [x,y]    - Goal pose
-                            "dim"          [x,y]    - Map dimension
-                            "p"            (int)    - probability of arriving at desired state
-                            "prefix" (string) - where to save images for gifs.
-                            Leave unassigned if none
-        Returns:
-            Gridworld: State object
-        """
+    def __init__(self, _params = {}):
         super(GridWorldEnv, self).__init__()
         
         self.params_ = _params
@@ -81,9 +95,12 @@ class GridWorldEnv(gym.Env):
         else:
             self.p_ = 0.1
             
+        if "r_radius" not in self.params_:
+            self.params_["r_radius"] = 5
+            
         self.map_ = np.zeros(self.dim_)
         
-        self.rng_ = None
+        # self.rng_ = None
         
         for i in range(self.dim_[0]):
             for j in range(self.dim_[1]):
@@ -96,39 +113,46 @@ class GridWorldEnv(gym.Env):
         _high[1] = self.dim_[1]
         self.observation_space = gym.spaces.box.Box(low =np.zeros(2), high=_high)
         
+        if "render" not in self.params_:
+            self.params_["render"] = False
+        
         if self.params_["render"]:
             self.fig_ = plt.figure()
             self.ax_ = self.fig_.add_subplot(1,1,1)
         
-        if "prefix" in _params:
-            self.save_gif = True
-            self.prefix_ = _params["prefix"]
+        if "save_gif" not in self.params_:
+            self.params_["save_gif"] = False
+        
+        if "prefix" not in _params:
+            self.params_["prefix"] = current
+        
+        if self.params_["save_gif"]:
             self.count_im_ = 0
+    
+    def reset(self, seed = None, return_info=None):
+        """
+        Resets environment to initial conditions/state
+        
+        :param seed: (int) random number generator seed, *default*: None
+        :param return_info: (bool) , *default*: None
+        :return: (State) observation
+        """
+        super().reset(seed=seed)
+        # if seed != None:
+        #     self.rng_ = np.random.default_rng(seed)
+        # elif self.rng_ == None:
+        #      self.rng_ = np.random.default_rng() 
+        if "state" in self.params_:
+            self.agent_ = self.params_["state"]["pose"]
+        else:
+            self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)]
 
-
-    # def get_num_states(self):
-    #     """yikes
-
-    #     Returns:
-    #         _type_: _description_
-    #     """
-    #     return self.dim_[0]*self.dim_[1]
+        return self.get_observation()
     
     # def get_num_actions(self):
     #     return 4
     
-    # def reset(self, seed = None, return_info=None):
-
-    #     if seed != None:
-    #         self.rng_ = np.random.default_rng(seed)
-    #     elif self.rng_ == None:
-    #          self.rng_ = np.random.default_rng() 
-    #     if "state" in self.params_:
-    #         self.agent_ = self.params_["state"]["pose"]
-    #     else:
-    #         self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)]
-
-    #     return self.get_observation()
+    
         
     # def render(self, _fp = None):
     #     """    
@@ -168,36 +192,37 @@ class GridWorldEnv(gym.Env):
     #         #     self.fig_.savefig(_fp +"%d.eps" % self.img_num_)
     #         #     self.img_num_ += 1
     #         plt.pause(1)
-    #         # plt.savefig(self.prefix_ + "img" + str(self.count_im_) + ".png", format="png", bbox_inches="tight", pad_inches=0.05)
-    #         # self.count_im_+=1
+
     #         plt.show()
 
     #         # plt.close() 
     #     elif self.params_["print"]:
     #         print(self.agent_)
+    #         if self.params_["save_gif"]:
+    #           plt.savefig(self.prefix_ + "img" + str(self.count_im_) + ".png", format="png", bbox_inches="tight", pad_inches=0.05)
+    #           self.count_im_+=1
         
     # def get_observation(self):
     #     return deepcopy({"pose": [int(self.agent_[0]), int(self.agent_[1])]})
     
     
-    # def get_distance(self, s1, s2):
-    #     return np.sqrt( (s1[0]-s2[0])**2 + (s1[1]-s2[1])**2 )
+    
     
     
     # def get_reward(self, _s):
-    #     d = self.get_distance(_s, self.goal_)
-    #     if d >= 5:
+    #     d = get_distance(_s, self.goal_)
+    #     if d >= self.params_["r_radius"]:
     #         return -0.01
     #     else:
-    #         return 1 - (d**2)/25
+    #         return 1 - (d/self.params_["r_radius"])**2
     
     # def sample_transition(self, _action):
-    #     p = self.rng_.uniform()
+    #     p = self.np_random.uniform()
 
-    #     if p < self.p_:
+    #     if p < self.params_["p"]:
     #         # t = self.a_.copy()
     #         # t.remove(_action)
-    #         # _action = self.rng_.choice(t)     
+    #         # _action = self.np_random.choice(t)     
     #         _action = 4
     #     return _action
     

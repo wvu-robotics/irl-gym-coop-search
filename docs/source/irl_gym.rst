@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    irl_gym.envs
+   irl_gym.utils
 
 Module contents
 ---------------

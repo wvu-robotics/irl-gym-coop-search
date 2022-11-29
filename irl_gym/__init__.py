@@ -1,11 +1,14 @@
 from gym.envs.registration import register
 
+import sys
+import os
+
+current = os.path.dirname(os.path.realpath(__file__))
 
 """
 Installs irl_gym envs
 
 """
-
 register(
     id='irl_gym/GridWorld-v0',
     entry_point='irl_gym.envs:GridWorldEnv',
@@ -19,11 +22,18 @@ register(
     {
         "_params":
         {
-            "agent": [20,20],
             "dimensions": [40,40],
             "goal": [10,10],
+            "state": 
+            {
+                "pose": [20,20]
+            },
+            "r_radius": 5,
             "p": 0.1,
-            "prefix": "/home/jared/ambiguity_ws/data/gridworld/",
+            "render": False,
+            "print": True,
+            "prefix": current,
+            "save_gif": False,
             "reward_bounds": [0,1]
         }
     }
