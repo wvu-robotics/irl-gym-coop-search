@@ -43,16 +43,14 @@ class GridWorldEnv(gym.Env):
         
     **Reward**
     
-    $a \atop b$
+    $$a \atop b$$
         
-    .. math::
-        
-        R = \Biggl \lbrace
-        {
-        -0.01, d > r_{goal} 
-        \Atop
-        1 - \dfrac{d}{r}^2, d \leq r
-        },
+    .. math:: 
+    
+       R = \Biggl \lbrace { -0.01, d > r_{goal} \\
+       1 - \dfrac{d}{r}^2, d \leq r}
+    
+    ,
  
     where :math: `d` is the distance to the goal and :math: `r_{goal}` is the reward radius of the goal.
     
