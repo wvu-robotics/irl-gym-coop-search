@@ -14,7 +14,7 @@ register(
     entry_point='irl_gym.envs:GridWorldEnv',
     max_episode_steps=100,
     reward_threshold = None,
-    disable_env_checker=True,
+    disable_env_checker=False,
     nondeterministic = True,
     order_enforce = True,
     autoreset = False,
