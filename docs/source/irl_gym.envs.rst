@@ -7,7 +7,7 @@ Submodules
 Grid Tunnel
 -----------
 
-.. autoclass:: irl_gym.envs.grid_tunnel
+.. automodule:: irl_gym.envs.grid_tunnel
    :members:
    :special-members:
    :undoc-members:
@@ -24,7 +24,7 @@ Grid World
 Sailing
 -------
 
-.. autoclass:: irl_gym.envs.sailing
+.. automodule:: irl_gym.envs.sailing
    :members:
    :undoc-members:
    :show-inheritance:

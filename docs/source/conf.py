@@ -19,19 +19,25 @@ release = '0.0.1'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 mathjax_path="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.mathjax', 'sphinx_math_dollar']
+extensions = ['sphinx.ext.autodoc', 'sphinx_math_dollar', 'sphinx.ext.mathjax']
 
-mathjax_config = {
+mathjax2_config = {
+    'extensions': ['tex2jax.js'],
+    'jax': ['input/TeX', 'output/HTML-CSS'],
     'tex2jax': {
         'inlineMath': [ ["\\(","\\)"] ],
         'displayMath': [["\\[","\\]"] ],
+        'packages': ['base', 'require']
     },
 }
 
 mathjax3_config = {
-  "tex": {
+  'extensions': ['tex2jax.js'],
+  'jax': ['input/TeX', 'output/HTML-CSS'],
+  "tex2jax": {
     "inlineMath": [['\\(', '\\)']],
     "displayMath": [["\\[", "\\]"]],
+    'packages': ['base', 'require']
   }
 }
 
