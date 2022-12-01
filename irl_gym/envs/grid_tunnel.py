@@ -15,57 +15,52 @@ from copy import deepcopy
 
 
 class GridTunnelEnv(gym.Env):
-    """
-    Simple Gridworold where agent seeks to reach goal. 
+    """   
+    Simple Gridworld where agent seeks to reach goal. 
     
-    States
-    ------
-        {
-            "pose": [x,y]
-        }
-        
-    Observations
-    ------------
-        Agent position is fully observable: { "pose": [x,y] }
-
-    Actions
-    -------
-        -  S 0: move south        [ 0, -1]
-        -  W 1: move west         [-1,  0]
-        -  N 2: move north        [ 0,  1]
-        -  E 3: move east         [ 1,  0]
+    **States** (dict)
     
-    Transition 
-    ----------
-        -   params["p"]         Remain in place
-        -   1 - params["p"]     Transition to desired state
+    - "pose": [x,y]
         
-    Reward
-    ------
-        - 
-        - (-R_[0]*d) negative of distance
-        -   R_[1]  goal reached
-    Rendering:
-        - blue: agent
-        - green X: goal 
-        - blue X: goal + agent
-        - black: puddle
-    """
+    **Observations**
+    
+    Agent position is fully observable
 
+    **Actions**
+    
+    - 0: move south        [ 0, -1]
+    - 1: move west         [-1,  0]
+    - 2: move north        [ 0,  1]
+    - 3: move east         [ 1,  0]
+    
+    **Transition Probabilities**
+
+    - $p \qquad \qquad$ remain in place
+    - $1-p \quad \quad \:$ transition to desired state
+        
+    **Reward**
+    
+    - $-\,0.01 \qquad d > r_{goal} $
+    
+    - $1 - \dfrac{d}{r}^2 \quad \; \; d \leq r$
+    
+    where $d$ is the distance to the goal and $r_{goal}$ is the reward radius of the goal.
+    
+    **Input**
+    Input parameters are passed as arguments through the ``_params`` dict.
+    The corresponding keys are as follows:
+    
+    :param dimensions: ([x,y]) size of map, *default* [40,40]
+    :param goal: ([x,y]) position of goal, *default* [10,10]
+    :param state: (State) Initial state, *default*: {"pose": [20,20]}
+    :param r_radius: (float) Reward radius, *default*: 5.0
+    :param p: (float) probability of remaining in place, *default*: 0.1
+    :param render: (bool) render on/off, *default*: False
+    :param print: (bool) text render on/off, *default*: True
+    :param prefix: (string) where to save images, *default*: ""
+    :param save_gif: (bool) save images for gif, *default*: False
+    """
     def __init__(self, _params):
-        """
-        Constructor, initializes state
-        Args:
-            _params (dict): "agent"        [x,y]    - Agent pose
-                            "goal"         [x,y]    - Goal pose
-                            "dim"          [x,y]    - Map dimension
-                            "p"            (int)    - probability of arriving at desired state
-                            "trap_offset"  (int)    - how many steps in +x direction local minima should be placed
-                            "prefix" (string) - where to save images for gifs.
-                            Leave unassigned if none
-        Returns:
-            State: State object
-        """
         super(GridTunnelEnv, self).__init__()
 
         self.params_ = _params

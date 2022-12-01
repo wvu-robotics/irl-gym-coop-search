@@ -7,4 +7,4 @@ irl_gym.egg-info/
 *.npy
 *.svg
 *.xcf
-
+*.pickle
