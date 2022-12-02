@@ -61,7 +61,9 @@ class GridWorldEnv(Env):
     where $d$ is the distance to the goal and $r_{goal}$ is the reward radius of the goal.
     
     **Input**
-    Input parameters are passed as arguments through the ``_params`` dict.
+    :param seed: (int) RNG seed, *default*: None
+    
+    Remaining parameters are passed as arguments through the ``_params`` dict.
     The corresponding keys are as follows:
     
     :param dimensions: ([x,y]) size of map, *default* [40,40]
@@ -75,42 +77,10 @@ class GridWorldEnv(Env):
     """
     metadata = {"render_modes": ["plot", "print", "none"]}
 
-    def __init__(self, _params = {}):
+    def __init__(self, *, seed = None, _params = {}):
         super(GridWorldEnv, self).__init__()
-        # self.reset(5)
-        # self.reset()
-        # self.reset(options=_params)
-        self.params_ = _params
         
-        # if "dimensions" not in self.params_:
-        #     self.params_["dimensions"] = [40, 40]
-        # if "goal" not in self.params_:
-        #     self.params_["goal"] = [np.round(self.params_["dimensions"][0]/4), np.round(self.params_["dimensions"][1]/4)]
-        # if "state" not in self.params_:
-        #     self.params_["state"]["pose"] = [np.round(self.params_["dimensions"][0]/2), np.round(self.params_["dimensions"][1]/2)]
-        # if "r_radius" not in self.params_:
-        #     self.params_["r_radius"] = 5
-        # if "p" not in self.params_:
-        #     self.params_["p"] = 0.1
-        
-        # if "render" not in self.params_:
-        #     self.params_["render"] = False
-        # if "print" not in self.params_:
-        #     self.params_["print"] = False
-        assert self.params_["render"] is None or self.params_["render"] in self.metadata["render_modes"]
-        # if self.params_["render"]:
-        #     self.fig_ = plt.figure()
-        #     self.ax_ = self.fig_.add_subplot(1,1,1)
-        #     self.map_ = np.zeros(self.params_["dimensions"])
-        #     for i in range(self.params_["dimensions"][0]):
-        #         for j in range(self.params_["dimensions"][1]):
-        #             self.map_[i][j] = self.get_reward([i,j])
-        # if "save_gif" not in self.params_:
-        #     self.params_["save_gif"] = False        
-        # if "prefix" not in self.params_:
-        #     self.params_["prefix"] = current   
-        # if self.params_["save_gif"]:
-        #     self.count_im_ = 0    
+        self.reset(seed, options=_params)
         
         self.a_ = [0, 1, 2, 3]
         self.action_space = spaces.discrete.Discrete(4)
@@ -121,45 +91,45 @@ class GridWorldEnv(Env):
         )
     
     def reset(self, *, seed: int = None, options: Optional[dict] = None):
-        #return_info: Optional[bool] =None,
         super().reset(seed=seed)
-        # self.state_ = self.params_["state"]
-        # return self._get_obs()
-        # super().reset(seed=seed)
-        # if options != None:
-        #     self.params_ = options
         
-        #     if "dimensions" not in self.params_:
-        #         self.params_["dimensions"] = [40, 40]
-        #     if "goal" not in self.params_:
-        #         self.params_["goal"] = [np.round(self.params_["dimensions"][0]/4), np.round(self.params_["dimensions"][1]/4)]
-        #     if "state" not in self.params_:
-        #         self.params_["state"]["pose"] = [np.round(self.params_["dimensions"][0]/2), np.round(self.params_["dimensions"][1]/2)]
-        #     if "r_radius" not in self.params_:
-        #         self.params_["r_radius"] = 5
-        #     if "p" not in self.params_:
-        #         self.params_["p"] = 0.1
-            
-        #     if "render" not in self.params_:
-        #         self.params_["render"] = False
-        #     if "print" not in self.params_:
-        #         self.params_["print"] = False
-        #     if self.params_["render"]:
-        #         self.fig_ = plt.figure()
-        #         self.ax_ = self.fig_.add_subplot(1,1,1)
-        #         self.map_ = np.zeros(self.params_["dimensions"])
-        #         for i in range(self.params_["dimensions"][0]):
-        #             for j in range(self.params_["dimensions"][1]):
-        #                 self.map_[i][j] = self.get_reward({"pose":[i,j]})
-        #     if "save_gif" not in self.params_:
-        #         self.params_["save_gif"] = False        
-        #     if "prefix" not in self.params_:
-        #         self.params_["prefix"] = current   
-        #     if self.params_["save_gif"]:
-        #         self.count_im_ = 0   
-        self.params_ = {"state":{}}
-        self.params_["state"]["pose"] = np.array([0,0]) #np.array(self.params_["state"]["pose"])
+        if options != None:
+            for el in options:
+                self.params_[el] = options[el]
+        
+            if "dimensions" not in self.params_:
+                self.params_["dimensions"] = [40, 40]
+            if "goal" not in self.params_:
+                self.params_["goal"] = [np.round(self.params_["dimensions"][0]/4), np.round(self.params_["dimensions"][1]/4)]
+            if "state" not in self.params_:
+                self.params_["state"]["pose"] = [np.round(self.params_["dimensions"][0]/2), np.round(self.params_["dimensions"][1]/2)]
+                print("p",type(self.params_["state"]["pose"]))
+            if "r_radius" not in self.params_:
+                self.params_["r_radius"] = 5
+            if "p" not in self.params_:
+                self.params_["p"] = 0.1
+                assert self.params_["render"] is None or self.params_["render"] in self.metadata["render_modes"]
+            if "render" not in self.params_:
+                self.params_["render"] = False
+            if "print" not in self.params_:
+                self.params_["print"] = False
+            if self.params_["render"]:
+                self.fig_ = plt.figure()
+                self.ax_ = self.fig_.add_subplot(1,1,1)
+                self.map_ = np.zeros(self.params_["dimensions"])
+                for i in range(self.params_["dimensions"][0]):
+                    for j in range(self.params_["dimensions"][1]):
+                        self.map_[i][j] = self.get_reward({"pose":[i,j]})
+            if "save_gif" not in self.params_:
+                self.params_["save_gif"] = False        
+            if "prefix" not in self.params_:
+                self.params_["prefix"] = current   
+            if self.params_["save_gif"]:
+                self.count_im_ = 0   
+        if type(self.params_["state"]["pose"]) != np.ndarray:
+            self.params_["state"]["pose"] = np.array(self.params_["state"]["pose"])
         self.state_ = self.params_["state"]
+
         return self._get_obs(), {}
     
     def step(self, _action):
@@ -170,10 +140,10 @@ class GridWorldEnv(Env):
         :return: (tuple) State, reward, is_done, is_truncate, info 
         """
         _action = self.sample_transition(_action)
-        self.state_["pose"] = self.get_coordinate_move(self.state_["pose"], _action)
+        self.state_["pose"] = np.array(self.get_coordinate_move(self.state_["pose"], _action))
         
-        r = self.get_reward(self.state_["pose"])
-        if self.state_["pose"] == self.params_["goal"]:
+        r = self.get_reward(self.state_)
+        if np.all(self.state_["pose"] == self.params_["goal"]):
             done = True
         else:
             done = False
