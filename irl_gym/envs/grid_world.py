@@ -1,36 +1,32 @@
 """
 This module contains the GridworldEnv for discrete path planning
-
-Syntax convention note: 
-- Using leading "_" for function arguments (except gym standard vars)
-- Using trailing "_" for member variables (except gym standard vars)
 """
-
 __license__ = "BSD-3"
 __docformat__ = 'reStructuredText'
 __author__ = "Jared Beard"
 
+from copy import deepcopy
+from typing import Optional
+import logging
+
 import sys
 import os
-
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
-from gym import Env, spaces
-
 import numpy as np
 import matplotlib.pyplot as plt
 
-from copy import deepcopy
-from typing import Optional
+from gym import Env, spaces
 
 from irl_gym.utils.utils import *
-
 
 class GridWorldEnv(Env):
     """   
     Simple Gridworld where agent seeks to reach goal. 
+    
+    For more informatin see `gym.Env docs <https://www.gymlibrary.dev/api/core/>`_
         
     **States** (dict)
     
@@ -80,7 +76,16 @@ class GridWorldEnv(Env):
     def __init__(self, *, seed = None, _params = {}):
         super(GridWorldEnv, self).__init__()
         
+        self._log = logging.getLogger( __name__)
+        self._log.debug("Init GridWorld")
         self.reset(seed, options=_params)
+        
+        self._id_action = {
+            0: np.array([0, -1]),
+            1: np.array([-1, 0]),
+            2: np.array([0, 1]),
+            3: np.array([1, 0]),
+        }
         
         self.a_ = [0, 1, 2, 3]
         self.action_space = spaces.discrete.Discrete(4)
@@ -91,7 +96,19 @@ class GridWorldEnv(Env):
         )
     
     def reset(self, *, seed: int = None, options: Optional[dict] = None):
+        """
+        Resets environment to initial state and sets RNG seed.
+        
+        **Deviates from Gym in that it is assumed you can reset 
+        RNG seed at will because why should it matter...**
+        
+        :param seed: (int) RNG seed, *default*:, None
+        :param options: (dict) params for reset, see initialization, *default*: None 
+        
+        :return: (tuple) State Observation, Info
+        """
         super().reset(seed=seed)
+        self._log.debug("Reset GridWorld")
         
         if options != None:
             for el in options:
@@ -126,11 +143,13 @@ class GridWorldEnv(Env):
                 self.params_["prefix"] = current   
             if self.params_["save_gif"]:
                 self.count_im_ = 0   
+        
         if type(self.params_["state"]["pose"]) != np.ndarray:
             self.params_["state"]["pose"] = np.array(self.params_["state"]["pose"])
         self.state_ = self.params_["state"]
-
-        return self._get_obs(), {}
+        self._log.info(str(self.state_))
+        
+        return self._get_obs(), self._get_info()
     
     def step(self, _action):
         """
@@ -139,16 +158,18 @@ class GridWorldEnv(Env):
         :param _action: (int) random number generator seed, *default*: None
         :return: (tuple) State, reward, is_done, is_truncate, info 
         """
-        _action = self.sample_transition(_action)
-        self.state_["pose"] = np.array(self.get_coordinate_move(self.state_["pose"], _action))
+        self._log.debug("Step action " + str(_action))
         
-        r = self.get_reward(self.state_)
+        _action = self.sample_transition(_action)
+        self.state_["pose"] = self.get_coordinate_move(self.state_["pose"], _action)
+        
         if np.all(self.state_["pose"] == self.params_["goal"]):
             done = True
         else:
             done = False
             
-        return self._get_obs(), r, done, False, {}
+        self._log.info("Is terminal: " + str(done))    
+        return self._get_obs(), self.get_reward(self.state_), done, False, self._get_info()
     
     def _get_obs(self):
         """
@@ -156,10 +177,18 @@ class GridWorldEnv(Env):
         
         :return: (State)
         """
+        self._log.debug("Get Obs: " + str(self.state_))
         return deepcopy(self.state_)
     
-    # def _get_info(self):
-    #     return {"distance": np.linalg.norm(self._agent_location - self._target_location, ord=1)}
+    def _get_info(self):
+        """
+        Gets info on system
+        
+        :return: (dict)
+        """
+        information = {"distance": np.linalg.norm(self.state_["pose"] - self.params_["goal"], ord=1)}
+        self._log.debug("Get Obs: " + str(information))
+        return information
     
     def get_reward(self, _s, _a = None, _sp = None):
         """
@@ -170,11 +199,15 @@ class GridWorldEnv(Env):
         :param _sp: (State) Action (unused in this class), *default*: None
         :return: (float) reward 
         """
-        d = get_distance(_s["pose"], self.params_["goal"])
+        self._log.debug("Get reward")
+        d = np.linalg.norm(self.state_["pose"] - self.params_["goal"], ord=1)
         if d >= self.params_["r_radius"]:
             return -0.01
         else:
             return 1 - (d/self.params_["r_radius"])**2
+
+
+
 
     def render(self, _fp = None):
         """    
@@ -220,9 +253,9 @@ class GridWorldEnv(Env):
             # plt.close() 
         elif self.params_["print"]:
             print(self.state_)
-            if self.params_["save_gif"]:
-              plt.savefig(self.prefix_ + "img" + str(self.count_im_) + ".png", format="png", bbox_inches="tight", pad_inches=0.05)
-              self.count_im_+=1
+        if self.params_["save_gif"]:
+            plt.savefig(self.prefix_ + "img" + str(self.count_im_) + ".png", format="png", bbox_inches="tight", pad_inches=0.05)
+            self.count_im_+=1
         
 
     
@@ -255,35 +288,22 @@ class GridWorldEnv(Env):
                 neighbors_ind.append(i)
         return neighbors, neighbors_ind
 
-    def get_coordinate_move(self, _position, _action):
-        _position = _position.copy()
-        step = []
-        if   _action == 0:
-            step = [ 0, -1] # S
-        elif _action == 1:
-            step = [-1,  0] # W
-        elif _action == 2:
-            step = [ 0,  1] # N
-        elif _action == 3:
-            step = [ 1,  0] # E
-        else:
-            step = [0, 0]   #  Z
-
-        temp = _position.copy()
-        temp[0] = temp[0] + step[0]
-        temp[1] = temp[1] + step[1]
+    def get_coordinate_move(self, pose, _action):
+        pose = pose.copy()
         
-        if temp[0] < 0:
-            temp[0] = 0
-        if temp[0] >= self.params_["dimensions"][0]:
-            temp[0] = self.params_["dimensions"][0]-1
-        if temp[1] < 0:
-                temp[1] = 0
-        if temp[1] >= self.params_["dimensions"][1]:
-            temp[1] = self.params_["dimensions"][1]-1
-        # print (_position)
-        # print(temp)
-        return temp
+        pose += self._id_action(_action)
+        
+        if pose[0] < 0:
+            pose[0] = 0
+        if pose[0] >= self.params_["dimensions"][0]:
+            pose[0] = self.params_["dimensions"][0]-1
+        if pose[1] < 0:
+                pose[1] = 0
+        if pose[1] >= self.params_["dimensions"][1]:
+            pose[1] = self.params_["dimensions"][1]-1
+        # print (_pose)
+        # print(pose)
+        return pose
 
     def get_action(self, _action):
         if   _action[0] ==  0 and _action[1] == -1:
