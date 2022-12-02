@@ -30,8 +30,7 @@ register(
             },
             "r_radius": 5,
             "p": 0.1,
-            "render": False,
-            "print": True,
+            "render": "none",
             "prefix": current,
             "save_gif": False,
             "reward_bounds": [0,1]
