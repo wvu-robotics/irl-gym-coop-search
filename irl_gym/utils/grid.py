@@ -12,6 +12,10 @@ def get_distance(s1, s2):
     """
     return ((s1[0]-s2[0])**2 + (s1[1]-s2[1])**2)**0.5
 
+# Don't do position, just pass back the list of movements
+# Then post process with floor and cap. 
+# also could generate a list list of -r to r in each dimension.
+# Then use get combinations. -> or rather do it manually as a generator
 def get_cells_in_radius(position, radius, ceil = None, flr = [0,0]):
    
     i = max([np.floor(position[0]-radius),flr[0]])

@@ -29,6 +29,7 @@ register(
                 "pose": [20,20]
             },
             "r_radius": 5,
+            "r_range": (-0.01, 1),
             "p": 0.1,
             "render": "none",
             "prefix": current,
