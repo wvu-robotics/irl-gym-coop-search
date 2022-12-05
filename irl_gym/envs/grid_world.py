@@ -16,8 +16,6 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 
 import numpy as np
-import matplotlib.pyplot as plt
-
 from gym import Env, spaces
 import pygame
 
@@ -74,21 +72,24 @@ class GridWorldEnv(Env):
     :param cell_size: (int) size of cells for visualization, *default*: 5
     :param prefix: (string) where to save images, *default*: "<current>/irl_gym/plot"
     :param save_frames: (bool) save images for gif, *default*: False
-    :param log_level: (int) Level of logging to use. For more info see `logging levels<https://docs.python.org/3/library/logging.html#levels>`, *default*: warning
+    :param log_level: (str) Level of logging to use. For more info see `logging levels<https://docs.python.org/3/library/logging.html#levels>`, *default*: "WARNING"
     """
     metadata = {"render_modes": ["plot", "print", "none"], "render_fps": 5}
 
     def __init__(self, *, seed = None, params = {}):
         super(GridWorldEnv, self).__init__()
         
-        self._log = logging.getLogger( __name__)
+        self._log = logging.getLogger(__name__)
+        self._log.addHandler(logging.StreamHandler(sys.stdout))
         if "log_level" not in params:
             self._log.setLevel(logging.WARNING)
         else:
-            self._log.setLevel(params["log_level"])
+            log_levels = {"NOTSET": logging.NOTSET, "DEBUG": logging.DEBUG, "INFO": logging.INFO, "WARNING": logging.WARNING, "ERROR": logging.ERROR ,"CRITICAL": logging.CRITICAL}
+            self._log.setLevel(log_levels[params["log_level"]])
         self._log.debug("Init GridWorld")
         
-        self.reset(seed, options=params)
+        self._params = {}
+        self.reset(seed=seed, options=params)
         
         self._id_action = {
             0: np.array([0, -1]),
@@ -129,12 +130,14 @@ class GridWorldEnv(Env):
             if "goal" not in self._params:
                 self._params["goal"] = [np.round(self._params["dimensions"][0]/4), np.round(self._params["dimensions"][1]/4)]
             if "state" not in self._params:
+                self._params["state"] = {"pose": None}
                 self._params["state"]["pose"] = [np.round(self._params["dimensions"][0]/2), np.round(self._params["dimensions"][1]/2)]
-                print("p",type(self._params["state"]["pose"]))
             if "r_radius" not in self._params:
                 self._params["r_radius"] = 5
             if "r_range" not in self._params:
-                self.reward_range((-0.01, 1))
+                self.reward_range = (-0.01, 1)
+            else:
+                self.reward_range = self._params["r_range"]
             if "p" not in self._params:
                 self._params["p"] = 0.1
             if "render" not in self._params:
@@ -142,12 +145,6 @@ class GridWorldEnv(Env):
             if "print" not in self._params:
                 self._params["print"] = False
             if self._params["render"] == "plot":
-                self.fig_ = plt.figure()
-                self.ax_ = self.fig_.add_subplot(1,1,1)
-                self.map_ = np.zeros(self._params["dimensions"])
-                for i in range(self._params["dimensions"][0]):
-                    for j in range(self._params["dimensions"][1]):
-                        self.map_[i][j] = self.reward({"pose":[i,j]})
                 self.window = None
                 self.clock = None
                 if "cell_size" not in self._params:
@@ -160,37 +157,37 @@ class GridWorldEnv(Env):
                 self._img_count = 0   
         
         if type(self._params["state"]["pose"]) != np.ndarray:
-            self._params["state"]["pose"] = np.array(self._params["state"]["pose"])
+            self._params["state"]["pose"] = np.array(self._params["state"]["pose"], dtype = int)
+        if type(self._params["goal"]) != np.ndarray:
+            self._params["goal"] = np.array(self._params["goal"], dtype = int)
         self._state = self._params["state"]      
-
         self._log.info(str(self._state))        
         return self._get_obs(), self._get_info()
     
-    def step(self, _action):
+    def step(self, a):
         """
         Increments enviroment by one timestep 
         
-        :param _action: (int) random number generator seed, *default*: None
+        :param a: (int) random number generator seed, *default*: None
         :return: (tuple) State, reward, is_done, is_truncate, info 
         """
-        self._log.debug("Step action " + str(_action))
+        self._log.debug("Step action " + str(a))
         
         done = False
-        
-        if self.np_random.multinomaial(1,[self._params["p"], 1-self._params["p"]]):
+        s = deepcopy(self._state)
+        if self.np_random.multinomial(1,[self._params["p"], 1-self._params["p"]])[1]:
             # multinomial produces a 1, then we got 1-p outomce
             # so carry out action, otherwise nothing happens
             p1 = self._state["pose"].copy()
-            p1 += self._id_action(_action)
+            p1 += self._id_action[a]
             
-            if self.observation_space.contains(p1):
+            if self.observation_space.contains({"pose": p1}):
                 self._state["pose"] = p1
-        
             if np.all(self._state["pose"] == self._params["goal"]):
                 done = True
         
-        r = self.reward(self._state)
-        self._log.info("Is terminal: " + str(done) + ", reward: ", r)    
+        r = self.reward(s, a, self._state)
+        self._log.info("Is terminal: " + str(done) + ", reward: " + str(r))    
         return self._get_obs(), r, done, False, self._get_info()
     
                           
@@ -201,6 +198,7 @@ class GridWorldEnv(Env):
         :param state: (State) state from which to get actions
         :return: ((list) actions, (list(ndarray)) subsequent states)
         """
+        self._log.debug("Get Actions at state : " + str(state))
         neighbors = []
         actions = []
         position = state["pose"].copy()
@@ -231,20 +229,20 @@ class GridWorldEnv(Env):
         :return: (dict)
         """
         information = {"distance": np.linalg.norm(self._state["pose"] - self._params["goal"], ord=1)}
-        self._log.debug("Get Obs: " + str(information))
+        self._log.debug("Get Info: " + str(information))
         return information
     
-    def reward(self, _s, _a = None, _sp = None):
+    def reward(self, s, a = None, sp = None):
         """
         Gets rewards for $(s,a,s')$ transition
         
-        :param _s: (State) Initial state
-        :param _a: (int) Action (unused in this class), *default*: None
-        :param _sp: (State) Action (unused in this class), *default*: None
+        :param s: (State) Initial state
+        :param a: (int) Action (unused in this class), *default*: None
+        :param sp: (State) Action (unused in this class), *default*: None
         :return: (float) reward 
         """
         self._log.debug("Get reward")
-        d = np.linalg.norm(self._state["pose"] - self._params["goal"], ord=1)
+        d = np.linalg.norm(sp["pose"] - self._params["goal"], ord=1)
         if d >= self._params["r_radius"]:
             return self.reward_range[0]
         else:
@@ -265,7 +263,8 @@ class GridWorldEnv(Env):
         - green diamond: goal 
         - red diamond: goal + agent
         """
-        if self._params["render_mode"] == "plot":
+        self._log.debug("Render " + self._params["render"])
+        if self._params["render"] == "plot":
             if self.window is None:
                 pygame.init()
                 pygame.display.init()
@@ -276,19 +275,21 @@ class GridWorldEnv(Env):
             img = pygame.Surface((self._params["dimensions"][0]*self._params["cell_size"], self._params["dimensions"][1]*self._params["cell_size"]))
             img.fill((255,255,255))
             
+            goal = [(self._params["goal"]+np.array([ 1  , 0.5  ]))*self._params["cell_size"], 
+                    (self._params["goal"]+np.array([ 0.5, 1  ]))*self._params["cell_size"], 
+                    (self._params["goal"]+np.array([ 0,   0.5]))*self._params["cell_size"], 
+                    (self._params["goal"]+np.array([ 0.5, 0  ]))*self._params["cell_size"]]
             # Agent
             if np.all(self._state["pose"] == self._params["goal"]):
-                pygame.draw.polygon(img, (255,0,0), [(self._state["pose"]+np.array([0.75,0])), (self._state["pose"]+np.array([0,0.75])), 
-                                                     (self._state["pose"]+np.array([-0.25,0])), (self._state["pose"]+np.array([0,-0.25]))])
+                pygame.draw.polygon(img, (255,0,0), goal)
             else:
                 pygame.draw.circle(img, (0,0,255), (self._state["pose"]+0.5)*self._params["cell_size"], self._params["cell_size"]/2)
-                pygame.draw.polygon(img, (0,255,0), [(self._state["pose"]+np.array([0.75,0])), (self._state["pose"]+np.array([0,0.75])), 
-                                                     (self._state["pose"]+np.array([-0.25,0])), (self._state["pose"]+np.array([0,-0.25]))])
+                pygame.draw.polygon(img, (0,255,0), goal)
             
-            for x in range(self._params["dimensions"][1]):
-                pygame.draw.line(img, 0, (0, self._params["cell_size"] * x), (self.window_size, self._params["cell_size"] * x), width=3)
             for y in range(self._params["dimensions"][1]):
-                pygame.draw.line(img, 0, (self._params["cell_size"] * y, 0), (self._params["cell_size"] * y, self.window_size), width=3)
+                pygame.draw.line(img, 0, (0, self._params["cell_size"] * y), (self._params["cell_size"]*self._params["dimensions"][0], self._params["cell_size"] * y), width=2)
+            for x in range(self._params["dimensions"][0]):
+                pygame.draw.line(img, 0, (self._params["cell_size"] * x, 0), (self._params["cell_size"] * x, self._params["cell_size"]*self._params["dimensions"][1]), width=2)
                 
             self.window.blit(img, img.get_rect())
             pygame.event.pump()
@@ -299,5 +300,5 @@ class GridWorldEnv(Env):
                 pygame.image.save(img, self.prefix_ + "img" + str(self.count_im_) + ".png")
                 self.count_im_+=1
                 
-        elif self._params["render_mode"] == "print":
+        elif self._params["render"] == "print":
             self._log.warning(str(self._state))

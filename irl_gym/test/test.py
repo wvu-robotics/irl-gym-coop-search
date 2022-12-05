@@ -1,15 +1,14 @@
 import gym, irl_gym
 import numpy as np
-env = gym.make("irl_gym/GridWorld-v0", max_episode_steps=5)
 
-# env.reset()
-# import inspect
-# print(inspect.signature(env.reset))
-# print(env.reset)
+import matplotlib.pyplot as plt
+
+param = {"log_level": "DEBUG","render": "plot", "dimensions": [50,30], "cell_size": 20, "goal": [15,15]}
+env = gym.make("irl_gym/GridWorld-v0", max_episode_steps=5, params=param)
 env.reset()
-print(env.step(3))
-env.reset(seed=4, options={"state":{"pose":np.array([5,0])}})
-print(env.step(3))
-env.reset(seed=4, options={"state":{"pose":np.array([3,3])}})
-print(env.step(3))
-env.reset(seed=4, options={"state":{"pose":np.array([2,0])}})
+done = False
+while not done:
+    s, r, done, _, _ = env.step(1)
+    print(s, r)
+    plt.pause(1)
+    env.render()

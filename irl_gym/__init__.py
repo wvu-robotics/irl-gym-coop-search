@@ -20,7 +20,7 @@ register(
     autoreset = False,
     kwargs = 
     {
-        "_params":
+        "params":
         {
             "dimensions": [40,40],
             "goal": [10,10],
@@ -32,11 +32,11 @@ register(
             "r_range": (-0.01, 1),
             "p": 0.1,
             "render": "none",
-            "cell_size": 5,
+            "cell_size": 50,
             "prefix": current + "/plot/",
             "save_frames": False,
-            "log_level": 30,
-            "reward_bounds": [0,1]
+            "log_level": "WARNING",
+            "r_range": (-0.05,1)
         }
     }
 )
