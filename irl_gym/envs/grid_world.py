@@ -80,7 +80,11 @@ class GridWorldEnv(Env):
         super(GridWorldEnv, self).__init__()
         
         self._log = logging.getLogger(__name__)
-        self._log.addHandler(logging.StreamHandler(sys.stdout))
+        log_sh = logging.StreamHandler(sys.stdout)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        log_sh.setFormatter(formatter)
+        self._log.addHandler(log_sh)
+
         if "log_level" not in params:
             self._log.setLevel(logging.WARNING)
         else:
@@ -274,6 +278,11 @@ class GridWorldEnv(Env):
             
             img = pygame.Surface((self._params["dimensions"][0]*self._params["cell_size"], self._params["dimensions"][1]*self._params["cell_size"]))
             img.fill((255,255,255))
+            for i in range(self._params["dimensions"][0]):
+                for j in range(self._params["dimensions"][1]):
+                    r = self.reward([],[],{"pose": [i,j]})
+                    if r > 0:
+                        pygame.draw.rect(img, ((1-r)*255, (1-r)*255, (1-r)*255), pygame.Rect(i*self._params["cell_size"], j*self._params["cell_size"], self._params["cell_size"], self._params["cell_size"]))
             
             goal = [(self._params["goal"]+np.array([ 1  , 0.5  ]))*self._params["cell_size"], 
                     (self._params["goal"]+np.array([ 0.5, 1  ]))*self._params["cell_size"], 
