@@ -123,7 +123,7 @@ class GridWorldEnv(Env):
         
         if options != None:
             for el in options:
-                self._params[el] = options[el]
+                self._params[el] = deepcopy(options[el])
         
             if "dimensions" not in self._params:
                 self._params["dimensions"] = [40, 40]
