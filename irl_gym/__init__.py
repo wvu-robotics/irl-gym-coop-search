@@ -32,8 +32,10 @@ register(
             "r_range": (-0.01, 1),
             "p": 0.1,
             "render": "none",
-            "prefix": current,
-            "save_gif": False,
+            "cell_size": 5,
+            "prefix": current + "/plot/",
+            "save_frames": False,
+            "log_level": 30,
             "reward_bounds": [0,1]
         }
     }

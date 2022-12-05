@@ -19,6 +19,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from gym import Env, spaces
+import pygame
 
 from irl_gym.utils.utils import *
 
@@ -50,11 +51,12 @@ class GridWorldEnv(Env):
         
     **Reward**
     
-    - $-\,r_{min} \qquad d > r_{goal} $
+    - $R_{min} \qquad \qquad d > r_{goal} $
     
-    - $r_{max} - \dfrac{d}{r}^2 \quad \; \; d \leq r$
+    - $R_{max} - \dfrac{d}{r}^2 \quad \; d \leq r$
     
-    where $d$ is the distance to the goal and $r_{goal}$ is the reward radius of the goal.
+    where $d$ is the distance to the goal, $r_{goal}$ is the reward radius of the goal, and
+    R_i$ are the reward extrema.
     
     **Input**
     :param seed: (int) RNG seed, *default*: None
@@ -69,15 +71,21 @@ class GridWorldEnv(Env):
     :param p: (float) probability of remaining in place, *default*: 0.1
     :param r_range: (tuple) min and max params of reward, *default*: (-0.01, 1)
     :param render: (str) render mode (see metadata for options), *default*: "none"
-    :param prefix: (string) where to save images, *default*: ""
-    :param save_gif: (bool) save images for gif, *default*: False
+    :param cell_size: (int) size of cells for visualization, *default*: 5
+    :param prefix: (string) where to save images, *default*: "<current>/irl_gym/plot"
+    :param save_frames: (bool) save images for gif, *default*: False
+    :param log_level: (int) Level of logging to use. For more info see `logging levels<https://docs.python.org/3/library/logging.html#levels>`, *default*: warning
     """
-    metadata = {"render_modes": ["plot", "print", "none"]}
+    metadata = {"render_modes": ["plot", "print", "none"], "render_fps": 5}
 
     def __init__(self, *, seed = None, params = {}):
         super(GridWorldEnv, self).__init__()
         
         self._log = logging.getLogger( __name__)
+        if "log_level" not in params:
+            self._log.setLevel(logging.WARNING)
+        else:
+            self._log.setLevel(params["log_level"])
         self._log.debug("Init GridWorld")
         
         self.reset(seed, options=params)
@@ -129,7 +137,6 @@ class GridWorldEnv(Env):
                 self.reward_range((-0.01, 1))
             if "p" not in self._params:
                 self._params["p"] = 0.1
-            assert self._params["render"] is None or self._params["render"] in self.metadata["render_modes"]
             if "render" not in self._params:
                 self._params["render"] = "none"
             if "print" not in self._params:
@@ -141,12 +148,16 @@ class GridWorldEnv(Env):
                 for i in range(self._params["dimensions"][0]):
                     for j in range(self._params["dimensions"][1]):
                         self.map_[i][j] = self.reward({"pose":[i,j]})
-            if "save_gif" not in self._params:
-                self._params["save_gif"] = False
+                self.window = None
+                self.clock = None
+                if "cell_size" not in self._params:
+                    self._params["cell_size"] = 5
+            if "save_frames" not in self._params:
+                self._params["save_frames"] = False
             if "prefix" not in self._params:
                 self._params["prefix"] = current   
-            if self._params["save_gif"]:
-                self.count_im_ = 0   
+            if self._params["save_frames"]:
+                self._img_count = 0   
         
         if type(self._params["state"]["pose"]) != np.ndarray:
             self._params["state"]["pose"] = np.array(self._params["state"]["pose"])
@@ -181,6 +192,28 @@ class GridWorldEnv(Env):
         r = self.reward(self._state)
         self._log.info("Is terminal: " + str(done) + ", reward: ", r)    
         return self._get_obs(), r, done, False, self._get_info()
+    
+                          
+    def get_actions(self, state):
+        """
+        Gets list of actions for a given pose
+
+        :param state: (State) state from which to get actions
+        :return: ((list) actions, (list(ndarray)) subsequent states)
+        """
+        neighbors = []
+        actions = []
+        position = state["pose"].copy()
+
+        for i, el in enumerate(self._id_action):
+            temp = position.copy()
+            temp += self._id_action[el]
+            
+            if self.observation_space.contains(temp):
+                neighbors.append({"pose": temp})
+                actions.append(i)
+                
+        return actions, neighbors
     
     def _get_obs(self):
         """
@@ -217,69 +250,54 @@ class GridWorldEnv(Env):
         else:
             return self.reward_range[1] - (d/self._params["r_radius"])**2
 
-
-
-
-    def render(self, _fp = None):
+    def render(self):
         """    
-        Rendering
+        Renders environment
+        
+        Has two render modes: 
+        
+        - *plot* uses PyGame visualization
+        - *print* logs state to console
 
-        - blue: agent
-        - green X: goal 
-        - blue X: goal + agent
+        Visualization
+        
+        - blue circle: agent
+        - green diamond: goal 
+        - red diamond: goal + agent
         """
-            #plt.clf()
-        # print(self._state)
-        if self._params["render"]:
-            plt.cla()
-            #plt.grid()
-            size = 100/self._params["dimensions"][0]
-            # Render the environment to the screen
-            t_map = (self.map_)
-            print("max map ", np.max(np.max(self.map_)))
-            plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
-            if self._state["pose"][0] != self._params["goal"][0] or self._state["pose"][1] != self._params["goal"][1]:
-                plt.plot(self._state["pose"][0], self._state["pose"][1],
-                        'bo', markersize=size)  # blue agent
-                plt.plot(self._params["goal"][0], self._params["goal"][1],
-                        'gX', markersize=size)
-            else:
-                plt.plot(self._params["goal"][0], self._params["goal"][1],
-                        'bX', markersize=size) # agent and goal
-
-            # # ticks = np.arange(-0.5, self._params["dimensions"][0]-0.5, 1)
-            # # self.ax_.set_xticks(ticks)
-            # # self.ax_.set_yticks(ticks)
-            # plt.xticks(color='w')
-            # plt.yticks(color='w')
-            # plt.show(block=False)
-            # if _fp != None:
-            #     self.fig_.savefig(_fp +"%d.png" % self.img_num_)
-            #     self.fig_.savefig(_fp +"%d.eps" % self.img_num_)
-            #     self.img_num_ += 1
-            plt.pause(1)
-
-            plt.show()
-
-            # plt.close() 
-        elif self._params["print"]:
-            print(self._state)
-        if self._params["save_gif"]:
-            plt.savefig(self.prefix_ + "img" + str(self.count_im_) + ".png", format="png", bbox_inches="tight", pad_inches=0.05)
-            self.count_im_+=1
-                      
-    def get_actions(self, _position):
-        neighbors = []
-        actions = []
-
-        for el, i in enumerate(self._id_action):
-            temp = _position.copy()
-            temp += self._id_action[el]
+        if self._params["render_mode"] == "plot":
+            if self.window is None:
+                pygame.init()
+                pygame.display.init()
+                self.window = pygame.display.set_mode((self._params["dimensions"][0]*self._params["cell_size"], self._params["dimensions"][1]*self._params["cell_size"]))
+            if self.clock is None:
+                self.clock = pygame.time.Clock()
             
-            if self.observation_space.contains(temp):
-                neighbors.append(temp)
-                actions.append(i)
-        return actions, neighbors
-
-    def write_gif(self):
-        pass
+            img = pygame.Surface((self._params["dimensions"][0]*self._params["cell_size"], self._params["dimensions"][1]*self._params["cell_size"]))
+            img.fill((255,255,255))
+            
+            # Agent
+            if np.all(self._state["pose"] == self._params["goal"]):
+                pygame.draw.polygon(img, (255,0,0), [(self._state["pose"]+np.array([0.75,0])), (self._state["pose"]+np.array([0,0.75])), 
+                                                     (self._state["pose"]+np.array([-0.25,0])), (self._state["pose"]+np.array([0,-0.25]))])
+            else:
+                pygame.draw.circle(img, (0,0,255), (self._state["pose"]+0.5)*self._params["cell_size"], self._params["cell_size"]/2)
+                pygame.draw.polygon(img, (0,255,0), [(self._state["pose"]+np.array([0.75,0])), (self._state["pose"]+np.array([0,0.75])), 
+                                                     (self._state["pose"]+np.array([-0.25,0])), (self._state["pose"]+np.array([0,-0.25]))])
+            
+            for x in range(self._params["dimensions"][1]):
+                pygame.draw.line(img, 0, (0, self._params["cell_size"] * x), (self.window_size, self._params["cell_size"] * x), width=3)
+            for y in range(self._params["dimensions"][1]):
+                pygame.draw.line(img, 0, (self._params["cell_size"] * y, 0), (self._params["cell_size"] * y, self.window_size), width=3)
+                
+            self.window.blit(img, img.get_rect())
+            pygame.event.pump()
+            pygame.display.update()
+            self.clock.tick(self.metadata["render_fps"])
+            
+            if self._params["save_frames"]:
+                pygame.image.save(img, self.prefix_ + "img" + str(self.count_im_) + ".png")
+                self.count_im_+=1
+                
+        elif self._params["render_mode"] == "print":
+            self._log.warning(str(self._state))

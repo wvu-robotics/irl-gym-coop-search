@@ -1,5 +1,8 @@
 import numpy as np
 
+#generators consume elements
+
+
 def get_distance(s1, s2):
     """_summary_
 
