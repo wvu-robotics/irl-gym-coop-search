@@ -70,7 +70,7 @@ class GridWorldEnv(Env):
     :param r_range: (tuple) min and max params of reward, *default*: (-0.01, 1)
     :param render: (str) render mode (see metadata for options), *default*: "none"
     :param cell_size: (int) size of cells for visualization, *default*: 5
-    :param prefix: (string) where to save images, *default*: "<current>/irl_gym/plot"
+    :param prefix: (string) where to save images, *default*: "<cwd>/plot"
     :param save_frames: (bool) save images for gif, *default*: False
     :param log_level: (str) Level of logging to use. For more info see `logging levels<https://docs.python.org/3/library/logging.html#levels>`, *default*: "WARNING"
     """
@@ -156,7 +156,7 @@ class GridWorldEnv(Env):
             if "save_frames" not in self._params:
                 self._params["save_frames"] = False
             if "prefix" not in self._params:
-                self._params["prefix"] = current   
+                self._params["prefix"] = os.getcwd() + "/plot/"
             if self._params["save_frames"]:
                 self._img_count = 0   
         
@@ -306,8 +306,8 @@ class GridWorldEnv(Env):
             self.clock.tick(self.metadata["render_fps"])
             
             if self._params["save_frames"]:
-                pygame.image.save(img, self.prefix_ + "img" + str(self.count_im_) + ".png")
-                self.count_im_+=1
+                pygame.image.save(img, self._params["prefix"] + "img" + str(self._img_count) + ".png")
+                self._img_count += 1
                 
         elif self._params["render"] == "print":
             self._log.warning(str(self._state))
