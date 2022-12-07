@@ -397,7 +397,14 @@ class SailingEnv(Env):
                     if r > 0:
                         reward_scale = (self.reward_range[1]-r)*255/self.reward_range[1]
                         pygame.draw.rect(img, (reward_scale, reward_scale, reward_scale), pygame.Rect(i*self._params["cell_size"], j*self._params["cell_size"], self._params["cell_size"], self._params["cell_size"]))
-            print(map)
+
+                    wind_direction = self._id_action[self._state["wind"][i][j]]
+                    wind_direction = np.arctan2(wind_direction[1],wind_direction[0])
+                    triangle = self._rotate_polygon(self._triangle,wind_direction)
+                    for k, el in enumerate(triangle):
+                        triangle[k] = el + (np.array([i,j])+0.5)*self._params["cell_size"]
+                    pygame.draw.polygon(img, (255,83,73), triangle)
+
             goal = [(self._params["goal"]+np.array([ 1  , 0.5  ]))*self._params["cell_size"], 
                     (self._params["goal"]+np.array([ 0.5, 1  ]))*self._params["cell_size"], 
                     (self._params["goal"]+np.array([ 0,   0.5]))*self._params["cell_size"], 
@@ -431,9 +438,7 @@ class SailingEnv(Env):
         elif self._params["render"] == "print":
             p = self._state["pose"]
             self._log.warning("Pose " + str(self._state["pose"]) + " | wind " + str([self._state["wind"][p[0]],self._state["wind"][p[1]]]))
-            
-            255, 83, 73
-    
+                
     def _rotate_polygon(self, vertices : list, angle : float, center : ndarray = np.zeros(2)):
         """
         Rotates a polygon by a given angle
