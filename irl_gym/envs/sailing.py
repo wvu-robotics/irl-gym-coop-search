@@ -251,16 +251,15 @@ class SailingEnv(Env):
         
         p1 = deepcopy(self._state)
         p1["pose"][0:2] += self._id_action[self._state["pose"][2]]
-        
+
         if self.observation_space.contains(p1):
-            print("yee")
-            self._state["pose"] = p1.copy()
+            self._state["pose"] = p1["pose"].copy()
+
         done = False
         if np.all(self._state["pose"] == self._params["goal"]):
             done = True        
         
         self._sample_wind()
-        
         r = self.reward(s, a, self._state)       
         self._log.info("Is terminal: " + str(done) + ", reward: " + str(r))    
         return self._get_obs(), r, done, False, self._get_info()   
@@ -417,7 +416,7 @@ class SailingEnv(Env):
                 move_direction = np.arctan2(move_direction[1],move_direction[0])
                 triangle = self._rotate_polygon(self._triangle,move_direction)
                 for i, el in enumerate(triangle):
-                    triangle[i] = 1.2*el + (self._state["pose"][0:2]+0.5)*self._params["cell_size"]
+                    triangle[i] = 2.5*el + (self._state["pose"][0:2]+0.5)*self._params["cell_size"]
                 pygame.draw.polygon(img, (0,0,255), triangle)
                 pygame.draw.polygon(img, (0,255,0), goal)
             
