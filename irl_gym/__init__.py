@@ -100,7 +100,7 @@ register(
             "prefix": current + "/plot/",
             "save_frames": False,
             "log_level": "WARNING",
-            "r_range": (-0.05,1)
+            "r_range": (-400,1100)
         }
     }
 )

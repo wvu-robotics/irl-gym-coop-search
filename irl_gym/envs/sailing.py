@@ -174,7 +174,7 @@ class SailingEnv(Env):
             if "r_radius" not in self._params:
                 self._params["r_radius"] = 5
             if "r_range" not in self._params:
-                self.reward_range = (-0.01, 1)
+                self.reward_range = (-400, 1100)
             else:
                 self.reward_range = self._params["r_range"]
             if "p" not in self._params:
@@ -395,8 +395,9 @@ class SailingEnv(Env):
                 for j in range(self._params["dimensions"][1]):
                     r = self.reward([],[],{"pose": [i,j,self._state["wind"][i][j]]})
                     if r > 0:
-                        pygame.draw.rect(img, ((1-r)*255, (1-r)*255, (1-r)*255), pygame.Rect(i*self._params["cell_size"], j*self._params["cell_size"], self._params["cell_size"], self._params["cell_size"]))
-            
+                        reward_scale = (self.reward_range[1]-r)*255/self.reward_range[1]
+                        pygame.draw.rect(img, (reward_scale, reward_scale, reward_scale), pygame.Rect(i*self._params["cell_size"], j*self._params["cell_size"], self._params["cell_size"], self._params["cell_size"]))
+            print(map)
             goal = [(self._params["goal"]+np.array([ 1  , 0.5  ]))*self._params["cell_size"], 
                     (self._params["goal"]+np.array([ 0.5, 1  ]))*self._params["cell_size"], 
                     (self._params["goal"]+np.array([ 0,   0.5]))*self._params["cell_size"], 
@@ -405,18 +406,11 @@ class SailingEnv(Env):
             if np.all(self._state["pose"] == self._params["goal"]):
                 pygame.draw.polygon(img, (255,0,0), goal)
             else:
-                print("----------")
                 move_direction = self._id_action[self._state["pose"][2]]
-                print(move_direction)
                 move_direction = np.arctan2(move_direction[1],move_direction[0])
-                print(move_direction)
-                print("mem tri ", self._triangle)
                 triangle = self._rotate_polygon(self._triangle,move_direction)
-                print(triangle)
-                print("pose ", self._state["pose"]*self._params["cell_size"])
                 for i, el in enumerate(triangle):
                     triangle[i] = 1.2*el + (self._state["pose"][0:2]+0.5)*self._params["cell_size"]
-                print(triangle)
                 pygame.draw.polygon(img, (0,0,255), triangle)
                 pygame.draw.polygon(img, (0,255,0), goal)
             
