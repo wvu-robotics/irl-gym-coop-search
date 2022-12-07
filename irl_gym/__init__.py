@@ -52,14 +52,23 @@ register(
     autoreset = False,
     kwargs = 
     {
-        "_params":
+        "params":
         {
-            "agent": [25,5],
-            "dimensions": [35,10],
+            "dimensions": [40,40],
             "goal": [10,10],
+            "state": 
+            {
+                "pose": [20,20]
+            },
+            "r_radius": 5,
+            "r_range": (-0.01, 1),
             "p": 0.1,
-            "prefix": "/home/jared/ambiguity_ws/data/gridworld/",
-            "reward_bounds": [0,1]
+            "render": "none",
+            "cell_size": 50,
+            "prefix": current + "/plot/",
+            "save_frames": False,
+            "log_level": "WARNING",
+            "r_range": (-0.05,1)
         }
     }
 )
@@ -75,14 +84,23 @@ register(
     autoreset = False,
     kwargs = 
     {
-        "_params":
+        "params":
         {
-            "agent": [20,20],
             "dimensions": [40,40],
             "goal": [10,10],
+            "state": 
+            {
+                "pose": [20,20]
+            },
+            "r_radius": 5,
+            "r_range": (-0.01, 1),
             "p": 0.1,
-            "prefix": "/home/jared/ambiguity_ws/data/gridworld/",
-            "reward_bounds": [0,1]
+            "render": "none",
+            "cell_size": 50,
+            "prefix": current + "/plot/",
+            "save_frames": False,
+            "log_level": "WARNING",
+            "r_range": (-0.05,1)
         }
     }
 )

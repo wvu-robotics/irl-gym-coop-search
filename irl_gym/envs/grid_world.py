@@ -107,14 +107,14 @@ class GridWorldEnv(Env):
             }
         )
     
-    def reset(self, *, seed: int = None, options: dict = None):
+    def reset(self, *, seed: int = None, options: dict = {}):
         """
         Resets environment to initial state and sets RNG seed.
         
         **Deviates from Gym in that it is assumed you can reset 
         RNG seed at will because why should it matter...**
         
-        :param seed: (int) RNG seed, *default*:, None
+        :param seed: (int) RNG seed, *default*:, {}
         :param options: (dict) params for reset, see initialization, *default*: None 
         
         :return: (tuple) State Observation, Info
@@ -122,7 +122,7 @@ class GridWorldEnv(Env):
         super().reset(seed=seed)
         self._log.debug("Reset GridWorld")
         
-        if options != None:
+        if options != {}:
             for el in options:
                 self._params[el] = deepcopy(options[el])
         
@@ -264,6 +264,7 @@ class GridWorldEnv(Env):
         - blue circle: agent
         - green diamond: goal 
         - red diamond: goal + agent
+        - Grey cells: The darker the shade, the higher the reward
         """
         self._log.debug("Render " + self._params["render"])
         if self._params["render"] == "plot":
