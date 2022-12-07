@@ -8,3 +8,4 @@ irl_gym.egg-info/
 *.svg
 *.xcf
 *.pickle
+*.vscode

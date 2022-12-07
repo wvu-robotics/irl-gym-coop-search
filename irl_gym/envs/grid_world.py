@@ -5,58 +5,55 @@ __license__ = "BSD-3"
 __docformat__ = 'reStructuredText'
 __author__ = "Jared Beard"
 
-from copy import deepcopy
-from typing import Optional
-import logging
-
 import sys
 import os
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
+from copy import deepcopy
+import logging
+
 import numpy as np
 from gym import Env, spaces
 import pygame
-
-from irl_gym.utils.utils import *
 
 class GridWorldEnv(Env):
     """   
     Simple Gridworld where agent seeks to reach goal. 
     
-    For more informatin see `gym.Env docs <https://www.gymlibrary.dev/api/core/>`_
+    For more information see `gym.Env docs <https://www.gymlibrary.dev/api/core/>`_
         
     **States** (dict)
     
-    - "pose": [x,y]
+        - "pose": [x, y]
         
     **Observations**
     
-    Agent position is fully observable
+        Agent position is fully observable
 
     **Actions**
     
-    - 0: move south        [ 0, -1]
-    - 1: move west         [-1,  0]
-    - 2: move north        [ 0,  1]
-    - 3: move east         [ 1,  0]
+        - 0: move south        [ 0, -1]
+        - 1: move west         [-1,  0]
+        - 2: move north        [ 0,  1]
+        - 3: move east         [ 1,  0]
     
     **Transition Probabilities**
 
-    - $p \qquad \qquad$ remain in place
-    - $1-p \quad \quad \:$ transition to desired state
+        - $p \qquad \qquad$ remain in place
+        - $1-p \quad \quad \:$ transition to desired state
         
     **Reward**
     
-    - $R_{min} \qquad \qquad d > r_{goal} $
+        - $R_{min}, \qquad \qquad \quad d > r_{goal} $
+        - $R_{max} - \dfrac{d}{r_{goal}}^2, \quad d \leq r_{goal}$
     
-    - $R_{max} - \dfrac{d}{r}^2 \quad \; d \leq r$
-    
-    where $d$ is the distance to the goal, $r_{goal}$ is the reward radius of the goal, and
-    R_i$ are the reward extrema.
+        where $d$ is the distance to the goal, $r_{goal}$ is the reward radius of the goal, and
+        R_i$ are the reward extrema.
     
     **Input**
+    
     :param seed: (int) RNG seed, *default*: None
     
     Remaining parameters are passed as arguments through the ``params`` dict.
@@ -65,18 +62,18 @@ class GridWorldEnv(Env):
     :param dimensions: ([x,y]) size of map, *default* [40,40]
     :param goal: ([x,y]) position of goal, *default* [10,10]
     :param state: (State) Initial state, *default*: {"pose": [20,20]}
-    :param r_radius: (float) Reward radius, *default*: 5.0
     :param p: (float) probability of remaining in place, *default*: 0.1
+    :param r_radius: (float) Reward radius, *default*: 5.0
     :param r_range: (tuple) min and max params of reward, *default*: (-0.01, 1)
     :param render: (str) render mode (see metadata for options), *default*: "none"
     :param cell_size: (int) size of cells for visualization, *default*: 5
     :param prefix: (string) where to save images, *default*: "<cwd>/plot"
     :param save_frames: (bool) save images for gif, *default*: False
-    :param log_level: (str) Level of logging to use. For more info see `logging levels<https://docs.python.org/3/library/logging.html#levels>`, *default*: "WARNING"
+    :param log_level: (str) Level of logging to use. For more info see `logging levels <https://docs.python.org/3/library/logging.html#levels>`_, *default*: "WARNING"
     """
     metadata = {"render_modes": ["plot", "print", "none"], "render_fps": 5}
 
-    def __init__(self, *, seed = None, params = {}):
+    def __init__(self, *, seed : int = None, params : dict = None):
         super(GridWorldEnv, self).__init__()
         
         self._log = logging.getLogger(__name__)
@@ -106,11 +103,11 @@ class GridWorldEnv(Env):
         self.action_space = spaces.discrete.Discrete(4)
         self.observation_space = spaces.Dict(
             {
-                "pose": spaces.box.Box(low =np.zeros(2), high=np.array(self._params["dimensions"])-1, dtype=int)
+                "pose": spaces.box.Box(low=np.zeros(2), high=np.array(self._params["dimensions"])-1, dtype=int)
             }
         )
     
-    def reset(self, *, seed: int = None, options: Optional[dict] = None):
+    def reset(self, *, seed: int = None, options: dict = None):
         """
         Resets environment to initial state and sets RNG seed.
         
@@ -133,9 +130,13 @@ class GridWorldEnv(Env):
                 self._params["dimensions"] = [40, 40]
             if "goal" not in self._params:
                 self._params["goal"] = [np.round(self._params["dimensions"][0]/4), np.round(self._params["dimensions"][1]/4)]
+            if type(self._params["goal"]) != np.ndarray:
+                self._params["goal"] = np.array(self._params["goal"], dtype = int)
             if "state" not in self._params:
                 self._params["state"] = {"pose": None}
                 self._params["state"]["pose"] = [np.round(self._params["dimensions"][0]/2), np.round(self._params["dimensions"][1]/2)]
+            if type(self._params["state"]["pose"]) != np.ndarray:
+                self._params["state"]["pose"] = np.array(self._params["state"]["pose"], dtype = int)
             if "r_radius" not in self._params:
                 self._params["r_radius"] = 5
             if "r_range" not in self._params:
@@ -160,20 +161,17 @@ class GridWorldEnv(Env):
             if self._params["save_frames"]:
                 self._img_count = 0   
         
-        if type(self._params["state"]["pose"]) != np.ndarray:
-            self._params["state"]["pose"] = np.array(self._params["state"]["pose"], dtype = int)
-        if type(self._params["goal"]) != np.ndarray:
-            self._params["goal"] = np.array(self._params["goal"], dtype = int)
-        self._state = self._params["state"]      
-        self._log.info(str(self._state))        
+        self._state = deepcopy(self._params["state"])
+        self._log.info(str(self._state))
+                
         return self._get_obs(), self._get_info()
     
-    def step(self, a):
+    def step(self, a : int):
         """
         Increments enviroment by one timestep 
         
-        :param a: (int) random number generator seed, *default*: None
-        :return: (tuple) State, reward, is_done, is_truncate, info 
+        :param a: (int) action, *default*: None
+        :return: (tuple) State, reward, is_done, is_truncated, info 
         """
         self._log.debug("Step action " + str(a))
         
@@ -195,17 +193,17 @@ class GridWorldEnv(Env):
         return self._get_obs(), r, done, False, self._get_info()
     
                           
-    def get_actions(self, state):
+    def get_actions(self, s : dict):
         """
         Gets list of actions for a given pose
 
-        :param state: (State) state from which to get actions
+        :param s: (State) state from which to get actions
         :return: ((list) actions, (list(ndarray)) subsequent states)
         """
-        self._log.debug("Get Actions at state : " + str(state))
+        self._log.debug("Get Actions at state : " + str(s))
         neighbors = []
         actions = []
-        position = state["pose"].copy()
+        position = s["pose"].copy()
 
         for i, el in enumerate(self._id_action):
             temp = position.copy()
@@ -232,21 +230,21 @@ class GridWorldEnv(Env):
         
         :return: (dict)
         """
-        information = {"distance": np.linalg.norm(self._state["pose"] - self._params["goal"], ord=1)}
+        information = {"distance": np.linalg.norm(self._state["pose"] - self._params["goal"])}
         self._log.debug("Get Info: " + str(information))
         return information
     
-    def reward(self, s, a = None, sp = None):
+    def reward(self, s : dict, a : int = None, sp : dict = None):
         """
         Gets rewards for $(s,a,s')$ transition
         
-        :param s: (State) Initial state
-        :param a: (int) Action (unused in this class), *default*: None
-        :param sp: (State) Action (unused in this class), *default*: None
+        :param s: (State) Initial state (unused in this environment)
+        :param a: (int) Action (unused in this environment), *default*: None
+        :param sp: (State) resultant state, *default*: None
         :return: (float) reward 
         """
         self._log.debug("Get reward")
-        d = np.linalg.norm(sp["pose"] - self._params["goal"], ord=1)
+        d = np.linalg.norm(sp["pose"] - self._params["goal"])
         if d >= self._params["r_radius"]:
             return self.reward_range[0]
         else:
@@ -259,7 +257,7 @@ class GridWorldEnv(Env):
         Has two render modes: 
         
         - *plot* uses PyGame visualization
-        - *print* logs state to console
+        - *print* logs state at Warning level
 
         Visualization
         
