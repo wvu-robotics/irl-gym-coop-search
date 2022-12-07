@@ -183,6 +183,10 @@ class SailingEnv(Env):
             if self._params["save_frames"]:
                 self._img_count = 0              
         
+        self._goal_polygon = [  (self._params["goal"]+np.array([ 1  , 0.5]))*self._params["cell_size"], 
+                                (self._params["goal"]+np.array([ 0.5, 1  ]))*self._params["cell_size"], 
+                                (self._params["goal"]+np.array([ 0,   0.5]))*self._params["cell_size"], 
+                                (self._params["goal"]+np.array([ 0.5, 0  ]))*self._params["cell_size"]]
         
         self.action_space = spaces.discrete.Discrete(3, start=-1)
 
@@ -387,6 +391,8 @@ class SailingEnv(Env):
             
             img = pygame.Surface((self._params["dimensions"][0]*self._params["cell_size"], self._params["dimensions"][1]*self._params["cell_size"]))
             img.fill((255,255,255))
+            
+            # Reward, wind
             for i in range(self._params["dimensions"][0]):
                 for j in range(self._params["dimensions"][1]):
                     r = self.reward([],[],{"pose": [i,j,self._state["wind"][i][j]]})
@@ -400,14 +406,10 @@ class SailingEnv(Env):
                     for k, el in enumerate(triangle):
                         triangle[k] = el + (np.array([i,j])+0.5)*self._params["cell_size"]
                     pygame.draw.polygon(img, (255,83,73), triangle)
-
-            goal = [(self._params["goal"]+np.array([ 1  , 0.5  ]))*self._params["cell_size"], 
-                    (self._params["goal"]+np.array([ 0.5, 1  ]))*self._params["cell_size"], 
-                    (self._params["goal"]+np.array([ 0,   0.5]))*self._params["cell_size"], 
-                    (self._params["goal"]+np.array([ 0.5, 0  ]))*self._params["cell_size"]]
             
+            # Agent, goal
             if np.all(self._state["pose"] == self._params["goal"]):
-                pygame.draw.polygon(img, (255,0,0), goal)
+                pygame.draw.polygon(img, (255,0,0), self._goal_polygon)
             else:
                 move_direction = self._id_action[self._state["pose"][2]]
                 move_direction = np.arctan2(move_direction[1],move_direction[0])
@@ -415,8 +417,9 @@ class SailingEnv(Env):
                 for i, el in enumerate(triangle):
                     triangle[i] = 2.5*el + (self._state["pose"][0:2]+0.5)*self._params["cell_size"]
                 pygame.draw.polygon(img, (0,0,255), triangle)
-                pygame.draw.polygon(img, (0,255,0), goal)
+                pygame.draw.polygon(img, (0,255,0), self._goal_polygon)
             
+            # Grid
             for y in range(self._params["dimensions"][1]):
                 pygame.draw.line(img, 0, (0, self._params["cell_size"] * y), (self._params["cell_size"]*self._params["dimensions"][0], self._params["cell_size"] * y), width=2)
             for x in range(self._params["dimensions"][0]):

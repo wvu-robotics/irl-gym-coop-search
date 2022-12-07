@@ -160,6 +160,11 @@ class GridWorldEnv(Env):
                 self._params["prefix"] = os.getcwd() + "/plot/"
             if self._params["save_frames"]:
                 self._img_count = 0   
+
+        self._goal_polygon = [  (self._params["goal"]+np.array([ 1  , 0.5]))*self._params["cell_size"], 
+                                (self._params["goal"]+np.array([ 0.5, 1  ]))*self._params["cell_size"], 
+                                (self._params["goal"]+np.array([ 0,   0.5]))*self._params["cell_size"], 
+                                (self._params["goal"]+np.array([ 0.5, 0  ]))*self._params["cell_size"]]
         
         self._state = deepcopy(self._params["state"])
         self._log.info(str(self._state))
@@ -277,22 +282,20 @@ class GridWorldEnv(Env):
             
             img = pygame.Surface((self._params["dimensions"][0]*self._params["cell_size"], self._params["dimensions"][1]*self._params["cell_size"]))
             img.fill((255,255,255))
+
+            # Reward
             for i in range(self._params["dimensions"][0]):
                 for j in range(self._params["dimensions"][1]):
                     r = self.reward([],[],{"pose": [i,j]})
                     if r > 0:
                         pygame.draw.rect(img, ((1-r)*255, (1-r)*255, (1-r)*255), pygame.Rect(i*self._params["cell_size"], j*self._params["cell_size"], self._params["cell_size"], self._params["cell_size"]))
             
-            goal = [(self._params["goal"]+np.array([ 1  , 0.5  ]))*self._params["cell_size"], 
-                    (self._params["goal"]+np.array([ 0.5, 1  ]))*self._params["cell_size"], 
-                    (self._params["goal"]+np.array([ 0,   0.5]))*self._params["cell_size"], 
-                    (self._params["goal"]+np.array([ 0.5, 0  ]))*self._params["cell_size"]]
-            # Agent
+            # Agent, goal
             if np.all(self._state["pose"] == self._params["goal"]):
-                pygame.draw.polygon(img, (255,0,0), goal)
+                pygame.draw.polygon(img, (255,0,0), self._goal_polygon)
             else:
                 pygame.draw.circle(img, (0,0,255), (self._state["pose"]+0.5)*self._params["cell_size"], self._params["cell_size"]/2)
-                pygame.draw.polygon(img, (0,255,0), goal)
+                pygame.draw.polygon(img, (0,255,0), self._goal_polygon)
             
             for y in range(self._params["dimensions"][1]):
                 pygame.draw.line(img, 0, (0, self._params["cell_size"] * y), (self._params["cell_size"]*self._params["dimensions"][0], self._params["cell_size"] * y), width=2)
