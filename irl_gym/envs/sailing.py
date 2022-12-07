@@ -125,18 +125,6 @@ class SailingEnv(Env):
             7: np.array([ 1, -1]),
         }
         
-        self.action_space = spaces.discrete.Discrete(3, start=-1)
-
-        upper = self._params["dimensions"].copy()
-        upper.append(8)
-        
-        self.observation_space = spaces.Dict(
-            {
-                "pose": spaces.box.Box(low=np.zeros(3), high=np.array(upper)-1, dtype=int),
-                "wind": spaces.box.Box(low=np.zeros(self._params["dimensions"]), high=7*np.ones(self._params["dimensions"]), dtype=int)
-            }
-        )
-        
         self._triangle = [np.array([0.3,0]),np.array([-0.3,-0.15]),np.array([-0.3,0.15])]
         for i, el in enumerate(self._triangle):
             self._triangle[i] = el*self._params["cell_size"]
@@ -195,6 +183,18 @@ class SailingEnv(Env):
             if self._params["save_frames"]:
                 self._img_count = 0              
         
+        
+        self.action_space = spaces.discrete.Discrete(3, start=-1)
+
+        upper = self._params["dimensions"].copy()
+        upper.append(8)
+        self.observation_space = spaces.Dict(
+            {
+                "pose": spaces.box.Box(low=np.zeros(3), high=np.array(upper)-1, dtype=int),
+                "wind": spaces.MultiDiscrete(8*np.ones(self._params["dimensions"]), dtype=int)
+            }
+        )
+
         # Potential TODO add option to retain wind at reinit
         if "wind" not in options:
             self._sample_wind(True)
@@ -218,10 +218,7 @@ class SailingEnv(Env):
         """
         if "wind" not in self._state or is_new:
             self._log.debug("Resample wind from scratch")
-            self._state["wind"] = np.zeros(self._params["dimensions"])
-            for i in range(self._params["dimensions"][0]):
-                for j in range(self._params["dimensions"][1]):
-                    self._state["wind"][i][j] = self.np_random.choice(range(8))
+            self._state["wind"] = self.observation_space["wind"].sample()
         else:
             self._log.debug("Resample wind update")
             for i in range(self._params["dimensions"][0]):
@@ -408,7 +405,7 @@ class SailingEnv(Env):
                     (self._params["goal"]+np.array([ 0.5, 1  ]))*self._params["cell_size"], 
                     (self._params["goal"]+np.array([ 0,   0.5]))*self._params["cell_size"], 
                     (self._params["goal"]+np.array([ 0.5, 0  ]))*self._params["cell_size"]]
-            # Agent
+            
             if np.all(self._state["pose"] == self._params["goal"]):
                 pygame.draw.polygon(img, (255,0,0), goal)
             else:
@@ -447,6 +444,7 @@ class SailingEnv(Env):
         :param center: (ndarray) coordinate about which to rotate polygon, *default*: [0,0] 
         """
         # Since there are only a few angles, could potentially preload all of them them pass in the matrix
+        self._log.debug("Rotate Polygon " + str(vertices) + " by " + str(angle) + " radians about " + str(center))
         vertices = deepcopy(vertices)
         R = np.zeros([2,2])
         R[0,0] = np.cos(angle)
