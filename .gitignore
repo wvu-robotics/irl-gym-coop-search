@@ -1,4 +1,4 @@
-build/
+docs/build/
 irl_gym.egg-info/
 *.eps
 *.png
