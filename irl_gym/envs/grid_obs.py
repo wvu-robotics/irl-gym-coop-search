@@ -1,0 +1,1 @@
+# Use for grid with mobile obstacles
