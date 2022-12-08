@@ -11,8 +11,6 @@ Welcome to IRL Gym's documentation!
    :caption: Contents:
 
    intro
-   modules
-
 
 Indices and tables
 ==================
