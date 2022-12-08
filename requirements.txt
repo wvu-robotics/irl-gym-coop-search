@@ -2,4 +2,4 @@ gym
 numpy
 pygame
 sphinx_math_dollar
--e .
+-e.
