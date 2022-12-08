@@ -1,24 +1,142 @@
 Introduction
 ============
 
-``simpleble`` is a high-level OO Python package which aims to provide an easy and intuitive way of interacting with nearby Bluetooth Low Energy (BLE) devices (GATT servers). In essence, this package is an extension of the ``bluepy`` package created by Ian Harvey (see `here <https://github.com/IanHarvey/bluepy/>`_)
+``irl-gym`` is a custom `OpenAI Gym <https://www.gymlibrary.dev/>`_ derivative to be used for primarily for research purposes.
+This package is intended to be used primarily with our `Decision Making toolbox <https://github.com/wvu-irl/ambiguous-decision-making>`_ (to be made public pending minor revisions).
 
-The aim here was to define a single object which would allow users to perform the various operations performed by the ``bluepy.btle.Peripheral``, ``bluepy.btle.Scanner``, ``bluepy.btle.Service`` and ``bluepy.btle.Characteristic`` classes of ``bluepy``, from one central place. This functionality is facilitated by the ``simpleble.SimpleBleClient`` and ``simpleble.SimpleBleDevice`` classes, where the latter is an extention/subclass of ``bluepy.btle.Peripheral``, combined with properties of ``bluepy.btle.ScanEntry``.
 
-The current implementation has been developed in Python 3 and tested on a Raspberry Pi Zero W, running Raspbian 9 (stretch), but should work with Python 2.7+ (maybe with minor modifications in terms of printing and error handling) and most Debian based OSs.
+Install
+*******
 
-Motivation
-**********
+From ``irl-gym/`` enter ``pip install -e .``
 
-As a newbie experimenter/hobbyist in the field of IoT using BLE communications, I found it pretty hard to identify a Python package which would enable one to use a Raspberry Pi (Zero W inthis case) to swiftly scan, connect to and read/write from/to a nearby BLE device (GATT server).
+To uninstall
 
-This package is intended to provide a quick, as well as (hopefully) easy to undestand, way of getting a simple BLE GATT client up and running, for all those out there, who, like myself, are hands-on learners and are eager to get their hands dirty from early on.
+``pip uninstall irl_gym``
 
-Limitations
-***********
 
-- As my main use-case scenario was to simply connect two devices, the current version of :class:`simpleble.SimpleBleClient` has been designed and implemented with this use-case in mind. As such, if you are looking for a package to allow you to connect to multiple devices, then know that off-the-self this package DOES NOT allow you to do so. However, implementing such a feature is an easily achievable task, which has been planned for sometime in the near future and if there proves to be interest on the project, I would be happy to speed up the process.
+Assumptions and Specifications
+******************************
 
-- Only Read and Write operations are currently supported, but I am planning on adding Notifications soon.
+Our enviroments assumes the following:
 
-- Although the interfacing operations of the :class:`bluepy.btle.Service` and :class:`bluepy.btle.Peripheral` classes have been brought forward to the :class:`simpleble.SimpleBleClient` class, the same has not been done for the :class:`bluepy.btle.Descriptor`, meaning that the :class:`simpleble.SimpleBleClient` cannot be used to directly access the Descriptors. This can however be done easily by obtaining a handle of a :class:`simpleble.SimpleBleDevice` object and calling the superclass :meth:`bluepy.btle.Peripheral.getDescriptors` method.
+
+Input
+-----
+
+To declare an algorithm, use 
+``env = gym.make("irl_gym/GridTunnel-v0", max_episode_steps=<desired max steps>, seed=<seed>, params=param)``
+
+As seen above, each algorithm should accepts as input a dictionary named ``params`` containing at a minimum 
+(this is not enforced but necessary to work with our algorithms).
+
+:param r_range: (tuple) of the reward min and reward max
+
+For rendering, include
+
+:param render: (str) render mode (see metadata for options), *default*: "none"
+:param prefix: (string) where to save images, *default*: "<cwd>/plot"
+:param save_frames: (bool) save images for gif, *default*: False
+
+For logging, 
+
+:param log_level: (str) Level of logging to use. For more info see `logging levels <https://docs.python.org/3/library/logging.html#levels>`_, *default*: "WARNING"
+
+
+Environment Members
+-------------------
+
+Variables
+^^^^^^^^^
+
+action_space (spaces.<type>)
+    This is consistent with `Gym standard for spaces <https://www.gymlibrary.dev/api/spaces/>`_.
+
+    We generally use ``int`` for actions but this is not required.
+_log (Logger)
+    Logger for printing and logging.
+metadata (dict)
+    Contains "render_modes" for setting render mode.
+observation_space (spaces.<type>)
+    This is consistent with `Gym standard for spaces <https://www.gymlibrary.dev/api/spaces/>`_.
+
+    We generally use ``dict`` for observations but this is not required.
+_params (dict)
+    For storing parameter values from `params`.
+_state (<observation type>)
+    Member for representing state.
+
+
+Functions
+^^^^^^^^^
+
+**Gym Standard**
+`More info on Gym <https://www.gymlibrary.dev/api/core/>`_
+
+__init__(seed : int, params : dict)
+    Initializes environment (we lump most of this functionality into reset).
+
+    *INPUT* Seed for RNG, params for environment
+
+reset(seed : int, options : dict)
+    Resets the environment state, seed, and parameters.
+
+    **Gym assumes seed is only set in** ``__init__`` **, however, we do not make this assumption as it gives greater flexibility to the planning tools.**
+
+    *INPUT* Seed for RNG, params for environment
+
+    *RETURNS* Observation, Info
+
+step(a : <action type>)
+    Performs desired action and increments the environment by one timestep.
+
+    *INPUT* Desired action
+
+    *RETURNS* Observation, Reward, Is Done, Is Truncated, Info
+
+_get_obs()
+    Private member that retrieves an observation.
+
+    *RETURNS* Observation
+
+_get_info()
+    Private member that retrieves desired information.
+
+    *RETURNS* Info
+
+reward(s,a,sp)
+    Calculates reward for desired state transition.
+
+    *INPUT* State, Action, Resulting State
+
+    *RETURNS* Reward
+
+render()
+    Renders environment as specified by ``render_mode``.
+
+
+**IRL Standard**
+
+get_actions(s)
+    Retrieves available actions from given state.
+
+    **May not return all subsquent states if they are too large, in this case it may help to factor states**
+
+    *INPUT* State
+
+    *RETURNS* list of actions, list of resulting states
+
+
+
+Citation
+--------
+If you are using this in your work, please cite as::
+
+    @misc{beard2022irl_gym,
+        author = {Beard, Jared J., Butts, Ronald M. , Gu, Yu},
+        title = {IRL-Gym: Custom Gym environments for academic research},
+        year = {2022},
+        publisher = {GitHub},
+        journal = {GitHub repository},
+        howpublished = {\url{https://github.com/wvu-irl/irl-gym}},
+    }
