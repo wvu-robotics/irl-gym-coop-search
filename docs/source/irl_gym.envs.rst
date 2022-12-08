@@ -22,7 +22,7 @@ Grid World
 Sailing
 -------
 
-.. automodule:: irl_gym.envs.sailing
+.. automodule:: envs.sailing
    :members:
    :undoc-members:
    :show-inheritance:
