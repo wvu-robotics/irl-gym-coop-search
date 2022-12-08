@@ -48,12 +48,12 @@ class GridTunnelEnv(GridWorldEnv):
         
     **Reward**
     
-        - $R_{min}, \qquad \qquad \quad d > r_{goal} $
+        - $R_{min}, \qquad \qquad \quad \; d > r_{goal} $
         - $\dfrac{R_{max} - \dfrac{d}{r_{goal}}^2}{2}, \quad d \leq r_{trap}$
-        - $R_{max} - \dfrac{d}{r_{goal}}^2, \quad d \leq r_{goal}$
+        - $R_{max} - \dfrac{d}{r_{goal}}^2, \quad \; d \leq r_{goal}$
     
         where $d$ is the distance to the goal, $r_i$ is the reward radius of the goal/trap respectively, and
-        R_i$ are the reward extrema.
+        $R_i$ are the reward extrema.
     
     **Input**
     

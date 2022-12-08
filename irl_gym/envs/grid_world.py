@@ -50,7 +50,7 @@ class GridWorldEnv(Env):
         - $R_{max} - \dfrac{d}{r_{goal}}^2, \quad d \leq r_{goal}$
     
         where $d$ is the distance to the goal, $r_{goal}$ is the reward radius of the goal, and
-        R_i$ are the reward extrema.
+        $R_i$ are the reward extrema.
     
     **Input**
     
