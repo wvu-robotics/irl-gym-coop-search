@@ -127,6 +127,29 @@ get_actions(s)
     *RETURNS* list of actions, list of resulting states
 
 
+__init__.py
+***********
+
+To add your env to the compiler, be sure your file is located in the ``envs/`` folder and
+insert the following code to your ``__init__.py``::
+
+    register(
+        id='irl_gym/<EnvName>-v0',
+        entry_point='irl_gym.envs:<EnvClass>',
+        max_episode_steps=100,
+        reward_threshold = None,
+        disable_env_checker=False,
+        nondeterministic = True,
+        order_enforce = True,
+        autoreset = False,
+        kwargs = 
+        {
+            "params":
+            {
+            }
+        }
+    )
+
 
 Citation
 --------
