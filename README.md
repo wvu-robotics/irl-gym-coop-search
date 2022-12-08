@@ -8,6 +8,5 @@ From *irl-gym/* , call
 pip install -e .
 ```
 
-## Documentation 
+## [Documentation](https://irl-gym.readthedocs.io/en/latest/)
 
-See ReadTheDocs (link pending)
