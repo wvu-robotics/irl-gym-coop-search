@@ -5,3 +5,4 @@ irl_gym
    :maxdepth: 4
 
    irl_gym
+   irl_gym.envs

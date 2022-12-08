@@ -1,4 +1,4 @@
-irl\_gym package
+IRL Gym package
 ================
 
 Subpackages
@@ -8,11 +8,3 @@ Subpackages
    :maxdepth: 4
 
    irl_gym.envs
-
-Module contents
----------------
-
-.. automodule:: irl_gym
-   :members:
-   :undoc-members:
-   :show-inheritance:
