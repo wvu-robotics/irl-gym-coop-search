@@ -5,7 +5,7 @@ Gym Environments
 Grid Tunnel
 -----------
 
-.. automodule:: irl_gym.envs.grid_tunnel
+.. autoclass:: irl_gym.envs.grid_tunnel
    :members:
    :special-members:
    :undoc-members:
