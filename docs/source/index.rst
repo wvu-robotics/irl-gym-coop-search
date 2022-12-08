@@ -11,7 +11,7 @@ Welcome to IRL Gym's documentation!
    :caption: Contents:
 
    intro
-   irl-gym.irl_gym.envs
+   irl_gym.envs
 
 Indices and tables
 ==================
