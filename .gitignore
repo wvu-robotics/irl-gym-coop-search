@@ -1,4 +1,4 @@
-docs/build/
+build/
 irl_gym.egg-info/
 *.eps
 *.png
@@ -9,3 +9,4 @@ irl_gym.egg-info/
 *.xcf
 *.pickle
 *.vscode
+*.doctree
