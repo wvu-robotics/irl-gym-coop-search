@@ -88,10 +88,8 @@ register(
         {
             "dimensions": [40,40],
             "goal": [10,10],
-            "state": 
-            {
-                "pose": [20,20]
-            },
+            "state_offset": 15,
+            "trap_offset": 17,
             "r_radius": 5,
             "r_range": (-0.01, 1),
             "p": 0.1,

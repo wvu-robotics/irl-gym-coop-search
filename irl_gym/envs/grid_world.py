@@ -250,10 +250,10 @@ class GridWorldEnv(Env):
         """
         self._log.debug("Get reward")
         d = np.linalg.norm(sp["pose"] - self._params["goal"])
-        if d >= self._params["r_radius"]:
-            return self.reward_range[0]
-        else:
+        
+        if d < self._params["r_radius"]:
             return self.reward_range[1] - (d/self._params["r_radius"])**2
+        return self.reward_range[0]
 
     def render(self):
         """    
