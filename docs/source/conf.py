@@ -10,7 +10,7 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 
-project = 'irl_gym'
+project = 'irl-gym'
 copyright = '2022, Jared J. Beard, R. Michael Butts, Yu Gu'
 author = 'Jared J. Beard, R. Michael Butts, Yu Gu'
 release = '0.0.1'
