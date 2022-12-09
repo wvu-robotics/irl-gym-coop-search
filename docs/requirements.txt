@@ -2,4 +2,5 @@ gym
 numpy
 pygame
 sphinx_math_dollar
+sphinx-rtd-theme
 -e.
