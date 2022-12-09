@@ -8,9 +8,9 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../irl_gym/'))
+sys.path.insert(0, os.path.abspath('..'))
 
-project = 'IRL Gym'
+project = 'irl_gym'
 copyright = '2022, Jared J. Beard, R. Michael Butts, Yu Gu'
 author = 'Jared J. Beard, R. Michael Butts, Yu Gu'
 release = '0.0.1'
@@ -19,7 +19,7 @@ release = '0.0.1'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 mathjax_path="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
-extensions = ['sphinx.ext.autodoc', 'sphinx_math_dollar', 'sphinx.ext.mathjax']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.coverage', 'sphinx_math_dollar', 'sphinx.ext.mathjax']
 
 mathjax2_config = {
     'extensions': ['tex2jax.js'],

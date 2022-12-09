@@ -1,4 +1,4 @@
-irl_gym
+IRL Gym
 =======
 
 .. toctree::

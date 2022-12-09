@@ -1,20 +1,21 @@
-Gym Environments
-================
+IRL Gym Environments
+====================
 
+Submodules
+----------
 
 Grid Tunnel
 -----------
 
-.. automodule:: irl-gym.irl_gym.envs.grid_tunnel
+.. automodule:: irl_gym.envs.grid_tunnel
    :members:
-   :special-members:
    :undoc-members:
    :show-inheritance:
 
 Grid World
 ----------
 
-.. automodule:: irl-gym.envs.grid_world
+.. automodule:: irl_gym.envs.grid_world
    :members:
    :undoc-members:
    :show-inheritance:
@@ -22,8 +23,15 @@ Grid World
 Sailing
 -------
 
-.. automodule:: envs.sailing
+.. automodule:: irl_gym.envs.sailing
    :members:
    :undoc-members:
    :show-inheritance:
 
+Module contents
+---------------
+
+.. automodule:: irl_gym.envs
+   :members:
+   :undoc-members:
+   :show-inheritance:
