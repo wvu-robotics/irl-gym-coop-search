@@ -95,9 +95,10 @@ class GridTunnelEnv(GridWorldEnv):
         
         :return: (tuple) State Observation, Info
         """
+        print("eey")
         super().reset(seed=seed, options=options)
         self._log.debug("Reset GridWorld")
-
+        print(self._params)
         if "state_offset" not in self._params:
             self._params["state_offset"] = 15
         if "trap_offset" not in self._params:

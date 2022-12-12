@@ -121,7 +121,7 @@ class GridWorldEnv(Env):
         """
         super().reset(seed=seed)
         self._log.debug("Reset GridWorld")
-        
+        print("yee")
         if options != {}:
             for el in options:
                 self._params[el] = deepcopy(options[el])
@@ -161,10 +161,11 @@ class GridWorldEnv(Env):
             if self._params["save_frames"]:
                 self._img_count = 0   
 
-        self._goal_polygon = [  (self._params["goal"]+np.array([ 1  , 0.5]))*self._params["cell_size"], 
-                                (self._params["goal"]+np.array([ 0.5, 1  ]))*self._params["cell_size"], 
-                                (self._params["goal"]+np.array([ 0,   0.5]))*self._params["cell_size"], 
-                                (self._params["goal"]+np.array([ 0.5, 0  ]))*self._params["cell_size"]]
+        if self._params["render"] == "plot":
+            self._goal_polygon = [  (self._params["goal"]+np.array([ 1  , 0.5]))*self._params["cell_size"], 
+                                    (self._params["goal"]+np.array([ 0.5, 1  ]))*self._params["cell_size"], 
+                                    (self._params["goal"]+np.array([ 0,   0.5]))*self._params["cell_size"], 
+                                    (self._params["goal"]+np.array([ 0.5, 0  ]))*self._params["cell_size"]]
         
         self._state = deepcopy(self._params["state"])
         self._log.info(str(self._state))

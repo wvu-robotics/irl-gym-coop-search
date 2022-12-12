@@ -183,10 +183,11 @@ class SailingEnv(Env):
             if self._params["save_frames"]:
                 self._img_count = 0              
         
-        self._goal_polygon = [  (self._params["goal"]+np.array([ 1  , 0.5]))*self._params["cell_size"], 
-                                (self._params["goal"]+np.array([ 0.5, 1  ]))*self._params["cell_size"], 
-                                (self._params["goal"]+np.array([ 0,   0.5]))*self._params["cell_size"], 
-                                (self._params["goal"]+np.array([ 0.5, 0  ]))*self._params["cell_size"]]
+        if self._params["render"] == "plot":
+            self._goal_polygon = [  (self._params["goal"]+np.array([ 1  , 0.5]))*self._params["cell_size"], 
+                                    (self._params["goal"]+np.array([ 0.5, 1  ]))*self._params["cell_size"], 
+                                    (self._params["goal"]+np.array([ 0,   0.5]))*self._params["cell_size"], 
+                                    (self._params["goal"]+np.array([ 0.5, 0  ]))*self._params["cell_size"]]
         
         self.action_space = spaces.discrete.Discrete(3, start=-1)
 
