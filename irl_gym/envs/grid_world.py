@@ -121,7 +121,7 @@ class GridWorldEnv(Env):
         """
         super().reset(seed=seed)
         self._log.debug("Reset GridWorld")
-        print("yee")
+
         if options != {}:
             for el in options:
                 self._params[el] = deepcopy(options[el])
