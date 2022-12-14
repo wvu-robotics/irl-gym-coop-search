@@ -35,7 +35,7 @@ register(
             "cell_size": 50,
             "prefix": current + "/plot/",
             "save_frames": False,
-            "log_level": "WARNING",
+            "log_level": "WARNING"
         }
     }
 )
@@ -66,7 +66,7 @@ register(
             "cell_size": 50,
             "prefix": current + "/plot/",
             "save_frames": False,
-            "log_level": "WARNING",
+            "log_level": "WARNING"
         }
     }
 )
