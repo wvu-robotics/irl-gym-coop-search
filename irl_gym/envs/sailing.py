@@ -125,9 +125,10 @@ class SailingEnv(Env):
             7: np.array([ 1, -1]),
         }
         
-        self._triangle = [np.array([0.3,0]),np.array([-0.3,-0.15]),np.array([-0.3,0.15])]
-        for i, el in enumerate(self._triangle):
-            self._triangle[i] = el*self._params["cell_size"]
+        if self._params["render"] == "plot":
+            self._triangle = [np.array([0.3,0]),np.array([-0.3,-0.15]),np.array([-0.3,0.15])]
+            for i, el in enumerate(self._triangle):
+                self._triangle[i] = el*self._params["cell_size"]
     
     def reset(self, *, seed: int = None, options: dict = {}):
         """
@@ -201,7 +202,7 @@ class SailingEnv(Env):
         )
 
         # Potential TODO add option to retain wind at reinit
-        if "wind" not in options:
+        if "state" not in options or "wind" not in options["state"]:
             self._sample_wind(True)
             self._params["state"]["wind"] = deepcopy(self._state["wind"])
         else:
