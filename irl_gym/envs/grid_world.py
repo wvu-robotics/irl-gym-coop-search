@@ -209,6 +209,8 @@ class GridWorldEnv(Env):
         self._log.debug("Get Actions at state : " + str(s))
         neighbors = []
         actions = []
+        print(s)
+        print(s["pose"])
         position = s["pose"].copy()
 
         for i, el in enumerate(self._id_action):

@@ -36,7 +36,6 @@ register(
             "prefix": current + "/plot/",
             "save_frames": False,
             "log_level": "WARNING",
-            "r_range": (-0.05,1)
         }
     }
 )
@@ -68,7 +67,6 @@ register(
             "prefix": current + "/plot/",
             "save_frames": False,
             "log_level": "WARNING",
-            "r_range": (-0.05,1)
         }
     }
 )
@@ -91,14 +89,13 @@ register(
             "state_offset": 15,
             "trap_offset": 17,
             "r_radius": 5,
-            "r_range": (-0.01, 1),
+            "r_range": (-400,1100),
             "p": 0.1,
             "render": "none",
             "cell_size": 50,
             "prefix": current + "/plot/",
             "save_frames": False,
-            "log_level": "WARNING",
-            "r_range": (-400,1100)
+            "log_level": "WARNING"
         }
     }
 )
