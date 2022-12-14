@@ -110,7 +110,7 @@ class GridTunnelEnv(GridWorldEnv):
         self._trap = self._params["goal"].copy()
         self._trap[0] += self._params["trap_offset"]
 
-        self._log.info(str(self._state))
+        self._log.info("Reset to state " + str(self._state))
                 
         return self._get_obs(), self._get_info()
 

@@ -208,7 +208,7 @@ class SailingEnv(Env):
             self._state["wind"] = self._params["state"]["wind"]
         
         self._state = deepcopy(self._params["state"])
-        self._log.info(str(self._state))  
+        self._log.info("Reset to state " + str(self._state))
         
         return self._get_obs(), self._get_info()
     

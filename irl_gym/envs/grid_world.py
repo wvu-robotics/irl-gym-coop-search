@@ -168,7 +168,7 @@ class GridWorldEnv(Env):
                                     (self._params["goal"]+np.array([ 0.5, 0  ]))*self._params["cell_size"]]
         
         self._state = deepcopy(self._params["state"])
-        self._log.info(str(self._state))
+        self._log.info("Reset to state " + str(self._state))
                 
         return self._get_obs(), self._get_info()
     
@@ -209,18 +209,16 @@ class GridWorldEnv(Env):
         self._log.debug("Get Actions at state : " + str(s))
         neighbors = []
         actions = []
-        print(s)
-        print(s["pose"])
         position = s["pose"].copy()
 
         for i, el in enumerate(self._id_action):
             temp = position.copy()
             temp += self._id_action[el]
-            
-            if self.observation_space.contains(temp):
+
+            if self.observation_space.contains({"pose": temp}):
                 neighbors.append({"pose": temp})
                 actions.append(i)
-                
+        print(actions)        
         return actions, neighbors
     
     def _get_obs(self):
