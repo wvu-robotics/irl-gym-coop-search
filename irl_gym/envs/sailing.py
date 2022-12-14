@@ -301,7 +301,8 @@ class SailingEnv(Env):
             if self.observation_space.contains(state):
                 neighbors.append({"pose": state["pose"]})
                 actions.append(i)
-                
+        
+        self._log.info("Actions are" + str(actions))        
         return actions, neighbors
     
     def _get_obs(self):

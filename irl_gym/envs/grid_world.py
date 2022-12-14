@@ -218,7 +218,8 @@ class GridWorldEnv(Env):
             if self.observation_space.contains({"pose": temp}):
                 neighbors.append({"pose": temp})
                 actions.append(i)
-        print(actions)        
+
+        self._log.info("Actions are" + str(actions))
         return actions, neighbors
     
     def _get_obs(self):
