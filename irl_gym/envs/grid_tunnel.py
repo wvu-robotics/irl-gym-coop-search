@@ -102,7 +102,6 @@ class GridTunnelEnv(GridWorldEnv):
         super().reset(seed=seed, options=options)
         self._log.debug("Reset GridTunnel")
 
-        print("before ", self._params["state"], self._state)
         if "state_offset" not in self._params:
             self._params["state_offset"] = 15
         if "trap_offset" not in self._params:
@@ -115,8 +114,6 @@ class GridTunnelEnv(GridWorldEnv):
         self._trap = self._params["goal"].copy()
         self._trap[0] += self._params["trap_offset"]
         
-        print("after ", self._params["state"], self._state)
-
         self._log.info("Reset to state " + str(self._state))
                 
         return self._get_obs(), self._get_info()
