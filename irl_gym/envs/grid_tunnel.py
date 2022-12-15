@@ -80,14 +80,6 @@ class GridTunnelEnv(GridWorldEnv):
     def __init__(self, *, seed : int = None, params : dict = None):
         super(GridTunnelEnv, self).__init__(seed = seed, params = params)
         
-        # if "log_level" not in params:
-        #     params["log_level"] = logging.WARNING
-        # else:
-        #     log_levels = {"NOTSET": logging.NOTSET, "DEBUG": logging.DEBUG, "INFO": logging.INFO, "WARNING": logging.WARNING, "ERROR": logging.ERROR ,"CRITICAL": logging.CRITICAL}
-        #     print(params["log_level"])
-        #     params["log_level"] = log_levels[params["log_level"]]
-                                             
-        # logging.basicConfig(stream=sys.stdout, format='[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s', level=params["log_level"])
         self._log = logging.getLogger(__name__)
         self._log.debug("Init GridTunnel")
 
