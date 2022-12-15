@@ -76,17 +76,15 @@ class GridWorldEnv(Env):
     def __init__(self, *, seed : int = None, params : dict = None):
         super(GridWorldEnv, self).__init__()
         
-        self._log = logging.getLogger(__name__)
-        log_sh = logging.StreamHandler(sys.stdout)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        log_sh.setFormatter(formatter)
-        self._log.addHandler(log_sh)
-
         if "log_level" not in params:
-            self._log.setLevel(logging.WARNING)
+            params["log_level"] = logging.WARNING
         else:
             log_levels = {"NOTSET": logging.NOTSET, "DEBUG": logging.DEBUG, "INFO": logging.INFO, "WARNING": logging.WARNING, "ERROR": logging.ERROR ,"CRITICAL": logging.CRITICAL}
-            self._log.setLevel(log_levels[params["log_level"]])
+            params["log_level"] = log_levels[params["log_level"]]
+                                             
+        logging.basicConfig(stream=sys.stdout, format='[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s', level=params["log_level"])
+        self._log = logging.getLogger(__name__)
+
         self._log.debug("Init GridWorld")
         
         self._params = {}
@@ -219,7 +217,7 @@ class GridWorldEnv(Env):
                 neighbors.append({"pose": temp})
                 actions.append(i)
 
-        self._log.info("Actions are" + str(actions))
+        self._log.info("Actions are " + str(actions))
         return actions, neighbors
     
     def _get_obs(self):
