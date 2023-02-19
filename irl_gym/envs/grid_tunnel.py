@@ -78,7 +78,7 @@ class GridTunnelEnv(GridWorldEnv):
     metadata = {"render_modes": ["plot", "print", "none"], "render_fps": 5}
 
     def __init__(self, *, seed : int = None, params : dict = None):
-        super(GridTunnelEnv, self).__init__(seed = seed, params = params)
+        super(GridTunnelEnv, self).__init__(seed = seed, params = deepcopy(params))
         
         self._log = logging.getLogger(__name__)
         self._log.debug("Init GridTunnel")
