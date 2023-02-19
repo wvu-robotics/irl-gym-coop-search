@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0", "gymnasium", "pygame"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "irl-gym"
+version = "2.2.0"
+authors = [
+  { name="Jared J. Beard", email="jbeard6@mix.wvu.edu" },
+]
+description = "Custom gyms for use in IRL"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+]
+
+[tools.setuptools]
+include_package_data = true
+
+[tools.setuptools.packages.find]
+where = ["irl_gym"]
+
+[project.urls]
+"Homepage" = "https://github.com/wvu-irl/irl-gym"
+"Documentation" = "https://irl-gym.readthedocs.io/en/latest/intro.html"
