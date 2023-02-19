@@ -1,4 +1,5 @@
-import gym, irl_gym
+import gymnasium as gym
+import, irl_gym
 import numpy as np
 
 import matplotlib.pyplot as plt

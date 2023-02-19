@@ -15,7 +15,7 @@ from copy import deepcopy
 import logging
 
 import numpy as np
-from gym import Env, spaces
+from gymnasium import Env, spaces
 import pygame
 from irl_gym.envs.grid_world import GridWorldEnv
 
@@ -24,7 +24,7 @@ class GridTunnelEnv(GridWorldEnv):
     """   
     Simple Gridworld where agent seeks to reach goal with a local minima. 
     
-    For more information see `gym.Env docs <https://www.gymlibrary.dev/api/core/>`_
+    For more information see `gym.Env docs <https://gymnasium.farama.org/api/env/>`_
         
     **States** (dict)
     

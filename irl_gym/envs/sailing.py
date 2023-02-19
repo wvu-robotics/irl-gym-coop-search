@@ -16,10 +16,8 @@ sys.path.append(parent)
 from copy import deepcopy
 import logging
 
-from gym import Env, spaces
-
 import numpy as np
-from gym import Env, spaces
+from gymnasium import Env, spaces
 import pygame
 
 class SailingEnv(Env):
@@ -28,7 +26,7 @@ class SailingEnv(Env):
     
     This environment is based on that of `JonAsbury's Sailing-v0 <https://gist.github.com/JonAsbury/1a8102e070b1ad9888857e7cbcb48f93>`_
     
-    For more information see `gym.Env docs <https://www.gymlibrary.dev/api/core/>`_
+    For more information see `gym.Env docs <https://gymnasium.farama.org/api/env/>`_
         
     **States** (dict)
     

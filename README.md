@@ -1,5 +1,5 @@
 # irl-gym
-Custom OpenAI gym environments
+Custom Farama Gymnasium environments
 
 ## Install 
 From *irl-gym/* , call
