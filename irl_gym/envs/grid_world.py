@@ -75,7 +75,6 @@ class GridWorldEnv(Env):
 
     def __init__(self, *, seed : int = None, params : dict = None):
         super(GridWorldEnv, self).__init__()
-        
         if "log_level" not in params:
             params["log_level"] = logging.WARNING
         else:
