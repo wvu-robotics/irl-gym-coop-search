@@ -1,8 +1,8 @@
 Introduction
 ============
 
-``irl-gym`` is a custom `OpenAI Gym <https://www.gymlibrary.dev/>`_ derivative to be used for primarily for research purposes.
-This package is intended to be used primarily with our `Decision Making toolbox <https://github.com/wvu-irl/ambiguous-decision-making>`_ (to be made public pending minor revisions).
+``irl-gym`` is a custom `Farama Gymansium <https://gymnasium.farama.org/>`_ derivative to be used for primarily for research purposes.
+This package is intended to be used primarily with our `Decision Making toolbox <https://github.com/wvu-irl/decision-making>`_ (to be made public pending minor revisions).
 
 
 Install
@@ -50,7 +50,7 @@ Variables
 ^^^^^^^^^
 
 action_space (spaces.<type>)
-    This is consistent with `Gym standard for spaces <https://www.gymlibrary.dev/api/spaces/>`_.
+    This is consistent with `Gym standard for spaces <https://gymnasium.farama.org/api/spaces/>`_.
 
     We generally use ``int`` for actions but this is not required.
 _log (Logger)
@@ -58,7 +58,7 @@ _log (Logger)
 metadata (dict)
     Contains "render_modes" for setting render mode.
 observation_space (spaces.<type>)
-    This is consistent with `Gym standard for spaces <https://www.gymlibrary.dev/api/spaces/>`_.
+    This is consistent with `Gym standard for spaces <https://gymnasium.farama.org/api/spaces/>`_.
 
     We generally use ``dict`` for observations but this is not required.
 _params (dict)
@@ -71,7 +71,7 @@ Functions
 ^^^^^^^^^
 
 **Gym Standard**
-`More info on Gym <https://www.gymlibrary.dev/api/core/>`_
+`More info on Gym <https://gymnasium.farama.org/api/env>`_
 
 __init__(seed : int, params : dict)
     Initializes environment (we lump most of this functionality into reset).
