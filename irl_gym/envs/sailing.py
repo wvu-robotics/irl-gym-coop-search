@@ -253,6 +253,8 @@ class SailingEnv(Env):
 
         if self.observation_space.contains(p1):
             self._state["pose"] = p1["pose"].copy()
+        else:
+            self._state["pose"][2] = p1["pose"][2]
 
         done = False
         if np.all(self._state["pose"] == self._params["goal"]):
@@ -295,9 +297,9 @@ class SailingEnv(Env):
             state["pose"][2]   = self._update_heading(state["pose"][2], el)
             state["pose"][0:2] = pose[0:2] + self._id_action[state["pose"][2]]
             
-            if self.observation_space.contains(state):
-                neighbors.append({"pose": state["pose"]})
-                actions.append(i)
+            # if self.observation_space.contains(state):
+            neighbors.append({"pose": state["pose"]})
+            actions.append(i)
         
         self._log.info("Actions are" + str(actions))        
         return actions, neighbors
