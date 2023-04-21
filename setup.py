@@ -5,7 +5,7 @@ setup(
     packages=find_packages(
         exclude=["docs", "plot"]
     ),
-    name="irl-gym",
+    name="irl_gym",
     version="2.0.0",
     install_requires=[],
 )

@@ -1,5 +1,5 @@
 import gymnasium as gym
-import, irl_gym
+import irl_gym
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -11,8 +11,6 @@ env.reset()
 done = False
 while not done:
     s, r, done, is_trunc, _ = env.step(0)
-    env.reset()
     print(s, r)
-    plt.pause(1)
     env.render()
     done = done or is_trunc

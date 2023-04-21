@@ -10,8 +10,8 @@ Installs irl_gym envs
 
 """
 register(
-    id='irl_gym/GridWorld-v0',
-    entry_point='irl_gym.envs:GridWorldEnv',
+    id='gym_coop_search/GridWorld-v0',
+    entry_point='gym_coop_search.envs:GridWorldEnv',
     max_episode_steps=100,
     reward_threshold = None,
     disable_env_checker=False,

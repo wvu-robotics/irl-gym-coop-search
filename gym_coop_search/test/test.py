@@ -1,5 +1,6 @@
 import gymnasium as gym
-import irl_gym
+# import irl_gym
+import gym_coop_search
 import numpy as np
 import numpy.random as r
 import matplotlib.pyplot as plt
@@ -28,7 +29,7 @@ goal = centers[goalChoice]
 
 #"log_level": "DEBUG",
 param = {"render": "plot", "render_fps": 15, "dimensions": [size_x, size_y], "cell_size": 22, "goal": [goal[1], goal[0]]}
-env = gym.make("irl_gym/GridWorld-v0", max_episode_steps=100, params=param)
+env = gym.make("gym_coop_search/GridWorld-v0", max_episode_steps=150, params=param)
 env.reset()
 done = False
 
