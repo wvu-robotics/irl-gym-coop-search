@@ -286,12 +286,12 @@ class GridWorldEnv(Env):
 
             cmap = cm.get_cmap('viridis')
 
-            for i in range(self._params["dimensions"][1]):
-                for j in range(self._params["dimensions"][0]):
+            for i in range(self._params["dimensions"][0]):
+                for j in range(self._params["dimensions"][1]):
                     # color = int(gaussian[i, j] * 255)
                     color = cmap(gaussian)[i, j]
                     r, g, b, a = [int(c * 255) for c in color]
-                    img.set_at((j, i), (r, g, b, a))
+                    img.set_at((i, j), (r, g, b, a))
             
             img = pygame.transform.scale(img, (self._params["dimensions"][0]*self._params["cell_size"], self._params["dimensions"][1]*self._params["cell_size"]))
 
