@@ -74,7 +74,7 @@ class GridWorldEnv(Env):
     """
     metadata = {"render_modes": ["plot", "print", "none"], "render_fps": 20}
 
-    def __init__(self, *, seed : int = None, params : dict = None):
+    def __init__(self, *, seed : int = None, params : dict = None, obstacles):
         super(GridWorldEnv, self).__init__()
         if "log_level" not in params:
             params["log_level"] = logging.WARNING
@@ -104,6 +104,8 @@ class GridWorldEnv(Env):
                 "pose": spaces.box.Box(low=np.zeros(2), high=np.array(self._params["dimensions"])-1, dtype=int)
             }
         )
+
+        self.obs = obstacles
     
     def reset(self, *, seed: int = None, options: dict = {}):
         """
@@ -179,17 +181,17 @@ class GridWorldEnv(Env):
         :return: (tuple) State, reward, is_done, is_truncated, info 
         """
         self._log.debug("Step action " + str(a))
-        
         done = False
         s = deepcopy(self._state)
         if self.np_random.multinomial(1,[self._params["p"], 1-self._params["p"]])[1]:
-            # multinomial produces a 1, then we got 1-p outomce
+            # multinomial produces a 1, then we got 1-p outcome
             # so carry out action, otherwise nothing happens
             p1 = self._state["pose"].copy()
             p1 += self._id_action[a]
             
-            if self.observation_space.contains({"pose": p1}):
-                self._state["pose"] = p1
+            if self.observation_space.contains({"pose": p1}): # make sure the agent is within the environment
+                if self.obs[p1[0], p1[1]] < 0.5: # avoid obstacle collisions
+                    self._state["pose"] = p1
             if np.all(self._state["pose"] == self._params["goal"]):
                 done = True
         
@@ -256,7 +258,7 @@ class GridWorldEnv(Env):
             return self.reward_range[1] - (d/self._params["r_radius"])**2
         return self.reward_range[0]
 
-    def custom_render(self, gaussian):
+    def custom_render(self, gaussian, obstacles):
         """    
         Renders environment
         
@@ -288,11 +290,15 @@ class GridWorldEnv(Env):
 
             for i in range(self._params["dimensions"][0]):
                 for j in range(self._params["dimensions"][1]):
-                    # color = int(gaussian[i, j] * 255)
-                    color = cmap(gaussian)[i, j]
-                    r, g, b, a = [int(c * 255) for c in color]
+                    if obstacles[i, j] < 0.5: # if the current square is in free space
+                        # color = int(gaussian[i, j] * 255)
+                        color = cmap(gaussian)[i, j]
+                        r, g, b, a = [int(c * 255) for c in color]
+                    else: # if an obstacle is in the current square
+                        color = cmap(obstacles)[i, j]
+                        r, g, b, a = [30, 30, 30, 0]
                     img.set_at((i, j), (r, g, b, a))
-            
+
             img = pygame.transform.scale(img, (self._params["dimensions"][0]*self._params["cell_size"], self._params["dimensions"][1]*self._params["cell_size"]))
 
 

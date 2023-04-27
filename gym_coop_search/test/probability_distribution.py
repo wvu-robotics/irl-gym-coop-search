@@ -2,9 +2,8 @@
 # Generates multiple 2D Gaussian distributions as a 2D array
 
 import numpy as np
-import matplotlib.pyplot as plt
 
-def gaussian_filter(size_x, size_y, goal, num_peaks_range, peak_height_range, peak_width_range_x, peak_width_range_y, peak_rot_range):
+def gaussian_filter(size_x, size_y, goal, goal_dist_offset_range, num_peaks_range, peak_height_range, peak_width_range_x, peak_width_range_y, peak_rot_range):
     # Initializing value of x, y as grid of defined size
     x, y = np.meshgrid(np.linspace(-1, 1, size_x),
                        np.linspace(-1, 1, size_y), indexing='ij')
@@ -19,13 +18,20 @@ def gaussian_filter(size_x, size_y, goal, num_peaks_range, peak_height_range, pe
     peak_widths_y = np.random.uniform(peak_width_range_y[0], peak_width_range_y[1], size=num_peaks)
     peak_rots = np.random.uniform(peak_rot_range[0], peak_rot_range[1], size=num_peaks)
     # Add peaks to Gaussian filter
-    q = 1
-    for i in range(num_peaks):
-        if q == 1:
-            peak_x = goal[0]
-            peak_y = goal[1]
-            q = 0
-        else:
+    firstPeak = True
+    withinRange = False
+    for i in range(num_peaks): # loop through each peak
+        if firstPeak == True: # set the first peak at the goal location
+            while withinRange == False: # loop until satisfied
+                x_offset = np.random.randint(goal_dist_offset_range[0], goal_dist_offset_range[1]) # generate offset in x
+                y_offset = np.random.randint(goal_dist_offset_range[0], goal_dist_offset_range[1]) # generate offset in y
+                peak_x = goal[0] + x_offset # offset goal distribution in x
+                peak_y = goal[1] + y_offset # offset goal distribution in y
+                if 0 <= peak_x <= size_x and 0 <= peak_y <= size_y: # make sure the new center of the peak is within the sim's size
+                    withinRange = True
+                    firstPeak = False # make sure only the first peak deals with the goal location
+            withinRange = False
+        else: # generate each peak except for the first one
             # Generate random positions for peaks
             peak_x = np.random.randint(0, size_x)
             peak_y = np.random.randint(0, size_y)

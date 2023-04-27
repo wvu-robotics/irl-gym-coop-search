@@ -27,7 +27,6 @@ register(
             "state": 
             {
                 "pose": [20,20],
-                # "search_prob": [0.52, 4.1],
             },
             "render": "none",
             "cell_size": 50,
