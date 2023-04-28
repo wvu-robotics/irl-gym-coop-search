@@ -4,17 +4,18 @@ import gym_coop_search
 import numpy as np
 import numpy.random as r
 import matplotlib.pyplot as plt
+from decision_maker import search_decision_maker
 from probability_distribution import gaussian_filter
-from obstacles import obstacles1, obstacles2
+from obstacles import obstacles0, obstacles1, obstacles2
 
 rng = r.default_rng()
 
 # size of environment
-size_x = 42
-size_y = 25
+size_x = 60
+size_y = 32
 
 # start and goal positions
-start = [7, 10]
+start = [17, 10]
 goal = [8, 3]
 
 # Probability Distributions
@@ -26,26 +27,39 @@ peak_width_range_x = [0.1, 0.6]  # range for peak width in x. values in % of tot
 peak_width_range_y = [0.1, 0.6]  # range for peak width in y. values in % of total environment size
 peak_rot_range = [0, np.deg2rad(180)]  # range for peak orientation
 
-gaussian, peaks, centers = gaussian_filter(size_x, size_y, goal, goal_dist_offset_range, num_peaks_range, peak_height_range, peak_width_range_x, peak_width_range_y, peak_rot_range)
+search_distribution, peaks, centers = gaussian_filter(size_x, size_y, goal, goal_dist_offset_range, num_peaks_range, peak_height_range, peak_width_range_x, peak_width_range_y, peak_rot_range)
 # print(centers)
 # print(peaks)
 
 # Obstacles
-obs = obstacles2(size_x, size_y, start, goal)
+obs = obstacles0(size_x, size_y, start, goal)
 
 #"log_level": "DEBUG",
-param = {"render": "plot", "render_fps": 15, "dimensions": [size_x, size_y], "cell_size": 20, "goal": [goal[0], goal[1]], "state": {"pose":[start[0], start[1]]}}
-env = gym.make("gym_coop_search/GridWorld-v0", max_episode_steps=80, params=param, obstacles=obs)
+param = {"render": "plot", "render_fps": 55, "dimensions": [size_x, size_y], "cell_size": 26, "goal": [goal[0], goal[1]], "state": {"pose":[start[0], start[1]]}}
+env = gym.make("gym_coop_search/GridWorld-v0", max_episode_steps=700, params=param, obstacles=obs)
 env.reset()
 done = False
+current_position = start
+search_observation = False # initial search observation (the agent shouldn't be at the goal intially)
+updated_search_distribution = search_distribution
+# print(obs)
+step = 0
 
 while not done:
-    s, r, done, is_trunc, _ = env.step(rng.choice(list(range(4)))) # step with random movement
-    print(s)
-    env.custom_render(gaussian, obs) # render the environment with search probabilities
+    s, r, done, is_trunc, _ = env.step(search_decision_maker(current_position, search_observation, updated_search_distribution)) # step with decision maker for search
+    step += 1
+    # print(updated_search_distribution.argmax())
+    # s, r, done, is_trunc, _ = env.step(rng.choice(list(range(4)))) # step with random movement
+    # print(s)
+    current_position = s["pose"] # update current position
+    # print(current_position) # print current position
+    search_observation = s["obs"]
+    # print(search_observation)
+    env.custom_render(updated_search_distribution, obs) # render the environment with search probabilities
     done = done or is_trunc
 
 if is_trunc == False:
     print('Goal Reached')
+    print(step)
 else:
     print('Ran out of steps')

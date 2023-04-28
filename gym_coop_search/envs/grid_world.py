@@ -96,7 +96,7 @@ class GridWorldEnv(Env):
             1: np.array([-1, 0]),
             2: np.array([0, 1]),
             3: np.array([1, 0]),
-            # 4: np.array([0, 0]),
+            4: np.array([0, 0]),
         }
         
         self.action_space = spaces.discrete.Discrete(4)
@@ -234,7 +234,7 @@ class GridWorldEnv(Env):
             "pose": deepcopy(self._state["pose"]),
             "obs": False  # default to not seeing an object
         }
-        if dist < 10:  # perfect sensor range
+        if dist < 1:  # perfect sensor range
             self.observation_space["obs"] = True  # object has been seen
         self._log.debug("Get Obs: " + str(self._state))
 
