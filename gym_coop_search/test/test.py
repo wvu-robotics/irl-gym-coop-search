@@ -35,13 +35,13 @@ obs = obstacles2(size_x, size_y, start, goal)
 
 #"log_level": "DEBUG",
 param = {"render": "plot", "render_fps": 15, "dimensions": [size_x, size_y], "cell_size": 20, "goal": [goal[0], goal[1]], "state": {"pose":[start[0], start[1]]}}
-env = gym.make("gym_coop_search/GridWorld-v0", max_episode_steps=120, params=param, obstacles=obs)
+env = gym.make("gym_coop_search/GridWorld-v0", max_episode_steps=80, params=param, obstacles=obs)
 env.reset()
 done = False
 
 while not done:
     s, r, done, is_trunc, _ = env.step(rng.choice(list(range(4)))) # step with random movement
-    # print(s)
+    print(s)
     env.custom_render(gaussian, obs) # render the environment with search probabilities
     done = done or is_trunc
 

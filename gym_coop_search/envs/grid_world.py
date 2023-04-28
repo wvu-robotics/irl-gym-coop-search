@@ -88,6 +88,7 @@ class GridWorldEnv(Env):
         self._log.debug("Init GridWorld")
         
         self._params = {}
+        # self.observation = {}
         self.reset(seed=seed, options=params)
         
         self._id_action = {
@@ -101,7 +102,8 @@ class GridWorldEnv(Env):
         self.action_space = spaces.discrete.Discrete(4)
         self.observation_space = spaces.Dict(
             {
-                "pose": spaces.box.Box(low=np.zeros(2), high=np.array(self._params["dimensions"])-1, dtype=int)
+                "pose": spaces.box.Box(low=np.zeros(2), high=np.array(self._params["dimensions"])-1, dtype=int),
+                "obs": spaces.Box(low=0, high=1, shape=(1,), dtype=int)
             }
         )
 
@@ -135,7 +137,6 @@ class GridWorldEnv(Env):
             if "state" not in self._params:
                 self._params["state"] = {"pose": None}
                 self._params["state"]["pose"] = [np.round(self._params["dimensions"][0]/2), np.round(self._params["dimensions"][1]/2)]
-                # self._params["state"]["search_prob"] = []
             if type(self._params["state"]["pose"]) != np.ndarray:
                 self._params["state"]["pose"] = np.array(self._params["state"]["pose"], dtype = int)
             if "r_radius" not in self._params:
@@ -188,10 +189,9 @@ class GridWorldEnv(Env):
             # so carry out action, otherwise nothing happens
             p1 = self._state["pose"].copy()
             p1 += self._id_action[a]
-            
-            if self.observation_space.contains({"pose": p1}): # make sure the agent is within the environment
+            if 0 <= p1[0] <= (self._params["dimensions"][0] - 1) and 0 <= p1[1] <= (self._params["dimensions"][1] - 1): # make sure the agent is within the environment
                 if self.obs[p1[0], p1[1]] < 0.5: # avoid obstacle collisions
-                    self._state["pose"] = p1
+                    self._state["pose"] = p1 # update the pose
             if np.all(self._state["pose"] == self._params["goal"]):
                 done = True
         
@@ -226,11 +226,19 @@ class GridWorldEnv(Env):
     def _get_obs(self):
         """
         Gets observation
-        
+
         :return: (State)
         """
+        dist = np.linalg.norm(self._state["pose"] - self._params["goal"]) # model a perfect sensor for now
+        self.observation_space = { # update the observation space
+            "pose": deepcopy(self._state["pose"]),
+            "obs": False  # default to not seeing an object
+        }
+        if dist < 10:  # perfect sensor range
+            self.observation_space["obs"] = True  # object has been seen
         self._log.debug("Get Obs: " + str(self._state))
-        return deepcopy(self._state)
+
+        return self.observation_space
     
     def _get_info(self):
         """
