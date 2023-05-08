@@ -27,7 +27,6 @@ register(
             "state": 
             {
                 "pose": [20,20],
-                "obj_sensed": False,
             },
             "render": "none",
             "cell_size": 50,
