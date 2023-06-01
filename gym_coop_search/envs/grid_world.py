@@ -92,11 +92,11 @@ class GridWorldEnv(Env):
         self.reset(seed=seed, options=params)
         
         self._id_action = {
-            0: np.array([0, -1]),
-            1: np.array([-1, 0]),
-            2: np.array([0, 1]),
-            3: np.array([1, 0]),
-            4: np.array([0, 0]),
+            0: np.array([0, -1]), # up
+            1: np.array([-1, 0]), # left
+            2: np.array([0, 1]),  # down
+            3: np.array([1, 0]),  # right
+            4: np.array([0, 0]),  # dont move
         }
         
         self.action_space = spaces.discrete.Discrete(4)
