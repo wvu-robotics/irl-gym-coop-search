@@ -9,16 +9,11 @@ from search_algorithms.beam_search import beam_search
 from search_algorithms.depth_limited_search import DLS
 from search_algorithms.receding_horizon_search import receding_horizon_search
 from search_algorithms.mcts_search import MCTS
-from make_observation import make_observation
 
 
 # Takes in the probability density at each location using the search distribution
 
 def search_decision_maker(size_x, size_y, cur_pos, observation, obstacles, last_action, distribution, waypoint_reached, waypoint):
-
-    temp_distribution = distribution.copy()
-
-    distribution = make_observation(size_x, size_y, cur_pos, observation, distribution)
 
     ########################################
     # Search methods
