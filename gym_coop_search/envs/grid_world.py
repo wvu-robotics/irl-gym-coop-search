@@ -252,7 +252,7 @@ class GridWorldEnv(Env):
         
         # Actual condition of the object being in range
         is_in_range = dist < 1
-        
+
         # Determine if the sensor gives correct reading
         if is_in_range:
             # True positive case (object is there and sensor says it's there)
