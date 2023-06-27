@@ -14,11 +14,11 @@ from make_observation import make_observation
 
 # Takes in the probability density at each location using the search distribution
 
-def search_decision_maker(size_x, size_y, cur_pos, obs, last_action, distribution, waypoint_reached, waypoint):
+def search_decision_maker(size_x, size_y, cur_pos, observation, obstacles, last_action, distribution, waypoint_reached, waypoint):
 
     temp_distribution = distribution.copy()
 
-    distribution = make_observation(size_x, size_y, cur_pos, obs, distribution)
+    distribution = make_observation(size_x, size_y, cur_pos, observation, distribution)
 
     ########################################
     # Search methods
@@ -29,7 +29,7 @@ def search_decision_maker(size_x, size_y, cur_pos, obs, last_action, distributio
     # relative_pos = event_horizon(cur_pos, distribution)
 
     # Receding horizon search
-    # best_action, visited, reward = receding_horizon_search(size_x, size_y, cur_pos, temp_distribution, obs, last_action, horizon=40, rollout=5, epsilon=0.1)
+    # best_action, visited, reward = receding_horizon_search(size_x, size_y, cur_pos, temp_distribution, observation, last_action, horizon=40, rollout=5, epsilon=0.1)
     # relative_pos = np.array(cur_pos) - np.array(cur_pos)
     # print(reward)
 
@@ -49,7 +49,7 @@ def search_decision_maker(size_x, size_y, cur_pos, obs, last_action, distributio
     # next_pos = DLS(size_x, size_y, cur_pos, distribution, limit=4)
     # relative_pos = np.array(next_pos) - np.array(cur_pos)
 
-    mcts = MCTS(size_x, size_y, cur_pos, distribution, num_iterations=200, c_param=0.6) # higher c values prioritize exploration (0 to 1)
+    mcts = MCTS(size_x, size_y, cur_pos, distribution, obstacles, num_iterations=300, c_param=0.6) # higher c values prioritize exploration (0 to 1)
     # Run the MCTS to get the optimal action
     best_action = mcts.simulate()
     relative_pos = np.array(cur_pos) - np.array(cur_pos)

@@ -28,6 +28,8 @@ register(
             {
                 "pose": [20,20],
             },
+            "p_false_pos":0.1,
+            "p_false_neg":0.1,
             "render": "none",
             "cell_size": 50,
             "prefix": current + "/plot/",

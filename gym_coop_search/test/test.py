@@ -9,8 +9,7 @@ from probability_distribution import gaussian_filter
 from obstacles import obstacles0, obstacles1, obstacles2
 import time
 
-seed = 26
-
+seed = 26 # set the random seed for the gaussian distribution generation
 rng = r.default_rng(seed=seed)
 
 # size of environment
@@ -30,15 +29,16 @@ peak_width_range_x = [0.08, 0.5]  # range for peak width in x. values in % of to
 peak_width_range_y = [0.08, 0.5]  # range for peak width in y. values in % of total environment size
 peak_rot_range = [0, np.deg2rad(180)]  # range for peak orientation
 
+# create the search distribution
 search_distribution, peaks, centers = gaussian_filter(seed, size_x, size_y, goal, goal_dist_offset_range, num_peaks_range, peak_height_range, peak_width_range_x, peak_width_range_y, peak_rot_range)
 
 # search_distribution = np.full((size_x, size_y), 0.5) # creates a uniform search distribution
 
 # Obstacles
-obs = obstacles0(size_x, size_y, start, goal)
+obs = obstacles2(size_x, size_y, start, goal)
 
 #"log_level": "DEBUG",
-param = {"render": "plot", "render_fps": 150, "dimensions": [size_x, size_y], "cell_size": 30, "goal": [goal[0], goal[1]], "state": {"pose":[start[0], start[1]]}}
+param = {"render": "plot", "render_fps": 150, "dimensions": [size_x, size_y], "cell_size": 30, "goal": [goal[0], goal[1]], "state": {"pose":[start[0], start[1]]}, "p_false_pos":0.1, "p_false_neg":0.1}
 env = gym.make("gym_coop_search/GridWorld-v0", max_episode_steps=1200, params=param, obstacles=obs)
 env.reset()
 done = False
@@ -56,7 +56,7 @@ step = 0
 
 while not done:
     action, search_distribution, waypoint_reached, waypoint = search_decision_maker(size_x, size_y, current_position, search_observation, action, search_distribution, waypoint_reached, waypoint) # step with decision maker for search
-    s, r, done, is_trunc, _ = env.step(action)
+    s, r, done, is_trunc, information = env.step(action)
 
     # print(updated_search_distribution.argmax())
     # s, r, done, is_trunc, _ = env.step(rng.choice(list(range(4)))) # step with random movement
@@ -65,6 +65,7 @@ while not done:
     # print(current_position) # print current position
     search_observation = s["obs"]
     print(step)
+    # print(search_observation)
     env.custom_render(search_distribution, obs) # render the environment with search probabilities
     step += 1
     done = done or is_trunc

@@ -147,6 +147,10 @@ class GridWorldEnv(Env):
                 self.reward_range = self._params["r_range"]
             if "p" not in self._params:
                 self._params["p"] = 0.1
+            if "p_false_pos" not in self._params:
+                self._params["p_false_pos"] = 0.1
+            if "p_false_neg" not in self._params:
+                self._params["p_false_neg"] = 0.1
             if "render" not in self._params:
                 self._params["render"] = "none"
             if "print" not in self._params:
@@ -176,7 +180,7 @@ class GridWorldEnv(Env):
     
     def step(self, a : int):
         """
-        Increments enviroment by one timestep 
+        Increments environment by one timestep 
         
         :param a: (int) action, *default*: None
         :return: (tuple) State, reward, is_done, is_truncated, info 
@@ -184,6 +188,7 @@ class GridWorldEnv(Env):
         self._log.debug("Step action " + str(a))
         done = False
         s = deepcopy(self._state)
+        
         if self.np_random.multinomial(1,[self._params["p"], 1-self._params["p"]])[1]:
             # multinomial produces a 1, then we got 1-p outcome
             # so carry out action, otherwise nothing happens
@@ -192,12 +197,20 @@ class GridWorldEnv(Env):
             if 0 <= p1[0] <= (self._params["dimensions"][0] - 1) and 0 <= p1[1] <= (self._params["dimensions"][1] - 1): # make sure the agent is within the environment
                 if self.obs[p1[0], p1[1]] < 0.5: # avoid obstacle collisions
                     self._state["pose"] = p1 # update the pose
-            if np.all(self._state["pose"] == self._params["goal"]):
-                done = True
+
+        # Get observation after the action is performed
+        observation = self._get_obs()
+        
+        # Check if the agent is at the goal position and has a positive observation
+        at_goal = np.all(self._state["pose"] == self._params["goal"])
+        positive_observation = observation["obs"]
+        
+        # Set done to True only if the agent is at the goal and has a positive observation
+        done = at_goal and positive_observation
         
         r = self.reward(s, a, self._state)
         self._log.info("Is terminal: " + str(done) + ", reward: " + str(r))    
-        return self._get_obs(), r, done, False, self._get_info()
+        return observation, r, done, False, self._get_info()
     
                           
     def get_actions(self, s : dict):
@@ -225,8 +238,10 @@ class GridWorldEnv(Env):
     
     def _get_obs(self):
         """
-        Gets observation
-
+        Gets observation with noisy sensor
+        
+        :param p_false_positive: Probability of false positive
+        :param p_false_negative: Probability of false negative
         :return: (State)
         """
         dist = np.linalg.norm(self._state["pose"] - self._params["goal"]) # model a perfect sensor for now
@@ -234,8 +249,20 @@ class GridWorldEnv(Env):
             "pose": deepcopy(self._state["pose"]),
             "obs": False  # default to not seeing an object
         }
-        if dist < 1:  # perfect sensor range
-            self.observation_space["obs"] = True  # object has been seen
+        
+        # Actual condition of the object being in range
+        is_in_range = dist < 1
+        
+        # Determine if the sensor gives correct reading
+        if is_in_range:
+            # True positive case (object is there and sensor says it's there)
+            # OR False negative case (object is there but sensor says it's not)
+            self.observation_space["obs"] = np.random.random() > self._params["p_false_neg"]
+        else:
+            # True negative case (object is not there and sensor says it's not)
+            # OR False positive case (object is not there but sensor says it is)
+            self.observation_space["obs"] = np.random.random() < self._params["p_false_pos"]
+        
         self._log.debug("Get Obs: " + str(self._state))
 
         return self.observation_space

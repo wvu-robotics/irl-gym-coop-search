@@ -18,7 +18,7 @@ class MCTSNode:
             self.children.append(child)
 
 class MCTS:
-    def __init__(self, size_x, size_y, cur_pos, distribution, num_iterations, c_param, max_rollout_steps=10):
+    def __init__(self, size_x, size_y, cur_pos, distribution, obstacles, num_iterations, c_param, max_rollout_steps=10):
         self.size_x = size_x
         self.size_y = size_y
         self.cur_pos = cur_pos
