@@ -19,6 +19,7 @@ def obstacles2(size_x, size_y, start, goal): # Env notes: x = 42, y = 25, start 
     obs[4:9, 9] = 1.0
     obs[4, 9:18] = 1.0
     obs[9, 9:20] = 1.0
+    obs[14:27, 14] = 1.0
     return obs
 
 
