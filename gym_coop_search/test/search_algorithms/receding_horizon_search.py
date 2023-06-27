@@ -1,7 +1,7 @@
 
 
 import numpy as np
-from make_observation import make_observation
+from gym_coop_search.test.update_distribution import update_distribution
 import time
 
 # Define possible actions

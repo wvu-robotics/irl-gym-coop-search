@@ -23,6 +23,7 @@ class MCTS:
         self.size_y = size_y
         self.cur_pos = cur_pos
         self.distribution = distribution
+        self.obstacles = obstacles
         self.num_iterations = num_iterations
         self.c_param = c_param
         self.max_rollout_steps = max_rollout_steps
@@ -46,7 +47,10 @@ class MCTS:
         for action, delta in self.actions.items():
             next_pos = cur_pos + delta
             if 0 <= next_pos[0] < self.size_x and 0 <= next_pos[1] < self.size_y:
-                action_rewards.append(self.distribution[next_pos[0], next_pos[1]])
+                if self.obstacles[next_pos[0], next_pos[1]] == 1:  # if there's an obstacle
+                    action_rewards.append(-np.inf)  # Discourage moving into the obstacle
+                else:
+                    action_rewards.append(self.distribution[next_pos[0], next_pos[1]])
             else:
                 action_rewards.append(-np.inf)  # Discourage moving off the grid
         # Transform action rewards into probabilities
@@ -91,9 +95,10 @@ class MCTS:
         cur_pos = cur_pos.copy()
         for _ in range(num_steps):
             action = np.random.choice(len(self.actions))  # Random action selection
-            cur_pos += self.actions[action]
-            if not (0 <= cur_pos[0] < self.size_x and 0 <= cur_pos[1] < self.size_y):
+            next_pos = cur_pos + self.actions[action]  # calculate next position
+            if not (0 <= next_pos[0] < self.size_x and 0 <= next_pos[1] < self.size_y) or self.obstacles[next_pos[0], next_pos[1]] == 1:  # if next position is off the grid or contains an obstacle
                 break
+            cur_pos = next_pos
             reward += self.distribution[cur_pos[0], cur_pos[1]]
         return reward
 
